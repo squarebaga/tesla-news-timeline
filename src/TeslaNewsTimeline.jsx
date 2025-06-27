@@ -1,7 +1,29 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from 'react-router-dom';
 
-function YouTubeEmbed({ url }) {
+function LazyYouTubeEmbed({ url }) {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   if (!url) return null;
   
   // Extract YouTube video ID from various URL formats
@@ -13,40 +35,119 @@ function YouTubeEmbed({ url }) {
   
   const videoId = getVideoId(url);
   if (!videoId) return null;
-  
+
   return (
-    <div className="mt-4 mb-4">
-      <iframe
-        width="100%"
-        height="200"
-        src={`https://www.youtube.com/embed/${videoId}`}
-        title="YouTube video player"
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowFullScreen
-        className="rounded-lg max-w-md"
-      ></iframe>
+    <div ref={ref} className="mt-4 mb-4">
+      {!isVisible ? (
+        <div className="w-full h-[200px] bg-gray-200 rounded-lg flex items-center justify-center max-w-md">
+          <span className="text-gray-500 text-sm">Loading video...</span>
+        </div>
+      ) : !isLoaded ? (
+        <div 
+          className="w-full h-[200px] bg-gray-800 rounded-lg flex items-center justify-center max-w-md cursor-pointer relative"
+          onClick={() => setIsLoaded(true)}
+        >
+          <div className="text-center text-white">
+            <div className="text-4xl mb-2">▶</div>
+            <div className="text-sm">Click to load video</div>
+          </div>
+        </div>
+      ) : (
+        <iframe
+          width="100%"
+          height="200"
+          src={`https://www.youtube.com/embed/${videoId}`}
+          title="YouTube video player"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          className="rounded-lg max-w-md"
+        ></iframe>
+      )}
+    </div>
+  );
+}
+
+// Virtual scrolling news item component
+function VirtualNewsItem({ item, index }) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { 
+        threshold: 0.1,
+        rootMargin: '100px 0px' // Load items 100px before they come into view
+      }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className="mb-12 relative min-h-[200px]">
+      <div className="absolute left-[-12px] top-1 w-3 h-3 bg-white rounded-full"></div>
+      {isVisible ? (
+        <>
+          <p className="text-sm text-white/70">
+            {item.date} <span className="ml-2 text-xs font-medium bg-white/10 px-2 py-1 rounded">{item.tag}</span>
+          </p>
+          <h2 className="text-xl font-semibold mt-2">{item.title}</h2>
+          <p className="text-white/90 mt-1">{item.summary}</p>
+          {item.youtubeUrl && <LazyYouTubeEmbed url={item.youtubeUrl} />}
+          <a href="#" className="text-white underline mt-2 inline-block">Read More</a>
+        </>
+      ) : (
+        <div className="animate-pulse">
+          <div className="h-4 bg-white/20 rounded w-32 mb-2"></div>
+          <div className="h-6 bg-white/20 rounded w-3/4 mb-2"></div>
+          <div className="h-4 bg-white/20 rounded w-full mb-1"></div>
+          <div className="h-4 bg-white/20 rounded w-2/3"></div>
+        </div>
+      )}
     </div>
   );
 }
 
 export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10); // Configurable items per page
-  
-  // Performance: Memoize pagination calculations
-  const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return {
-      items: newsItems.slice(startIndex, endIndex),
-      totalPages: Math.ceil(newsItems.length / itemsPerPage),
-      totalItems: newsItems.length,
-      startIndex: startIndex + 1,
-      endIndex: Math.min(endIndex, newsItems.length)
-    };
-  }, [newsItems, currentPage, itemsPerPage]);
+  const [visibleCount, setVisibleCount] = useState(20); // Start with 20 items
+  const loadMoreRef = useRef();
+
+  // Infinite scroll effect
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && visibleCount < newsItems.length) {
+          setVisibleCount(prev => Math.min(prev + 10, newsItems.length));
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [visibleCount, newsItems.length]);
+
+  // Reset visible count when newsItems change significantly
+  useEffect(() => {
+    setVisibleCount(20);
+  }, [newsItems.length]);
+
+  const visibleItems = useMemo(() => 
+    newsItems.slice(0, visibleCount), 
+    [newsItems, visibleCount]
+  );
   return (
     <div className="bg-red-700 min-h-screen p-6 text-white font-sans">
       <div className="max-w-2xl mx-auto">
@@ -70,61 +171,34 @@ export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
         </div>
         
         {/* Performance Stats */}
-        {paginatedData.totalItems > itemsPerPage && (
+        {newsItems.length > 20 && (
           <div className="mb-4 text-center text-white/60 text-sm">
-            Showing {paginatedData.startIndex}-{paginatedData.endIndex} of {paginatedData.totalItems} news items
+            Showing {visibleCount} of {newsItems.length} news items • Scroll to load more
           </div>
         )}
         
         <div className="relative border-l-2 border-white pl-6">
-          {paginatedData.items.map((item, index) => (
-            <div key={item.id || index} className="mb-12 relative">
-              <div className="absolute left-[-12px] top-1 w-3 h-3 bg-white rounded-full"></div>
-              <p className="text-sm text-white/70">{item.date} <span className="ml-2 text-xs font-medium bg-white/10 px-2 py-1 rounded">{item.tag}</span></p>
-              <h2 className="text-xl font-semibold mt-2">{item.title}</h2>
-              <p className="text-white/90 mt-1">{item.summary}</p>
-              {item.youtubeUrl && <YouTubeEmbed url={item.youtubeUrl} />}
-              <a href="#" className="text-white underline mt-2 inline-block">Read More</a>
-            </div>
+          {visibleItems.map((item, index) => (
+            <VirtualNewsItem key={item.id || index} item={item} index={index} />
           ))}
-        </div>
-        
-        {/* Pagination */}
-        {paginatedData.totalPages > 1 && (
-          <div className="mt-8 flex justify-center items-center gap-2">
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="px-3 py-2 bg-white/10 text-white rounded hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              ← Previous
-            </button>
-            
-            <div className="flex gap-1">
-              {[...Array(paginatedData.totalPages)].map((_, i) => (
-                <button
-                  key={i + 1}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={`px-3 py-2 rounded transition-colors ${
-                    currentPage === i + 1
-                      ? 'bg-white text-red-700 font-medium'
-                      : 'bg-white/10 text-white hover:bg-white/20'
-                  }`}
-                >
-                  {i + 1}
-                </button>
-              ))}
+          
+          {/* Infinite scroll trigger */}
+          {visibleCount < newsItems.length && (
+            <div ref={loadMoreRef} className="py-8 text-center">
+              <div className="inline-flex items-center gap-2 text-white/60 text-sm">
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                Loading more news...
+              </div>
             </div>
-            
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, paginatedData.totalPages))}
-              disabled={currentPage === paginatedData.totalPages}
-              className="px-3 py-2 bg-white/10 text-white rounded hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              Next →
-            </button>
-          </div>
-        )}
+          )}
+          
+          {/* End indicator */}
+          {visibleCount >= newsItems.length && newsItems.length > 20 && (
+            <div className="py-8 text-center text-white/60 text-sm">
+              🎉 You've reached the end! {newsItems.length} total news items
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
