@@ -45,6 +45,20 @@ function App() {
     localStorage.setItem('teslaNewsItems', JSON.stringify(updatedNews));
   };
 
+  const handleUpdateNews = (updatedNews) => {
+    const updatedItems = newsItems.map(item => 
+      item.id === updatedNews.id ? updatedNews : item
+    );
+    setNewsItems(updatedItems);
+    localStorage.setItem('teslaNewsItems', JSON.stringify(updatedItems));
+  };
+
+  const handleDeleteNews = (newsId) => {
+    const updatedNews = newsItems.filter(item => item.id !== newsId);
+    setNewsItems(updatedNews);
+    localStorage.setItem('teslaNewsItems', JSON.stringify(updatedNews));
+  };
+
   const handleLogin = () => {
     setIsLoggedIn(true);
     localStorage.setItem('teslaAdminLoggedIn', 'true');
@@ -73,6 +87,8 @@ function App() {
               <AdminPanel 
                 newsItems={newsItems}
                 onAddNews={handleAddNews}
+                onUpdateNews={handleUpdateNews}
+                onDeleteNews={handleDeleteNews}
                 onLogout={handleLogout}
               />
             ) : (
