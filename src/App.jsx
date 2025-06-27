@@ -45,6 +45,12 @@ function App() {
     localStorage.setItem('teslaNewsItems', JSON.stringify(updatedNews));
   };
 
+  const handleAddMultipleNews = (newsArray) => {
+    const updatedNews = [...newsArray, ...newsItems];
+    setNewsItems(updatedNews);
+    localStorage.setItem('teslaNewsItems', JSON.stringify(updatedNews));
+  };
+
   const handleUpdateNews = (updatedNews) => {
     const updatedItems = newsItems.map(item => 
       item.id === updatedNews.id ? updatedNews : item
@@ -87,6 +93,7 @@ function App() {
               <AdminPanel 
                 newsItems={newsItems}
                 onAddNews={handleAddNews}
+                onAddMultipleNews={handleAddMultipleNews}
                 onUpdateNews={handleUpdateNews}
                 onDeleteNews={handleDeleteNews}
                 onLogout={handleLogout}

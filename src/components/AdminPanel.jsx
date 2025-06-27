@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDeleteNews, onLogout }) {
+export default function AdminPanel({ newsItems, onAddNews, onAddMultipleNews, onUpdateNews, onDeleteNews, onLogout }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [editingNews, setEditingNews] = useState(null);
@@ -227,37 +227,84 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
 
   const generateSampleData = (count = 3) => {
     const titles = [
-      'Tesla Cybertruck Production Update',
-      'New Supercharger V4 Rollout',
-      'AI Day 2025 Announcement',
-      'Model Y Refresh Details',
-      'Gigafactory Berlin Expansion',
-      'FSD Beta V12 Release',
-      'Tesla Energy Storage Breakthrough',
-      'Robotaxi Network Launch',
-      'Neural Network Architecture Update',
-      'Battery Day Innovations'
+      'Tesla Cybertruck Production Milestone Achieved',
+      'Supercharger V4 Network Expansion Accelerates',
+      'AI Day 2025 Reveals Revolutionary Advances',
+      'Model Y Performance Refresh Unveiled',
+      'Gigafactory Berlin Doubles Production Capacity',
+      'FSD Beta V12 Shows Human-Level Performance',
+      'Tesla Energy Storage Breaks Industry Records',
+      'Robotaxi Service Launches in Major Cities',
+      'Neural Network Architecture Reaches New Heights',
+      'Battery Day Announces 4680 Cell Mass Production',
+      'Model S Plaid Sets New Nürburgring Record',
+      'Tesla Solar Roof Achieves Grid Parity',
+      'Optimus Robot Demonstrates Advanced Capabilities',
+      'Model 3 Highland Refresh Global Launch',
+      'Tesla Semi Completes Cross-Country Test',
+      'Megapack Factory Opens in Shanghai',
+      'FSD Hardware 4.0 Enters Production',
+      'Tesla Insurance Expands to New Markets',
+      'Cybertruck Beast Mode Performance Test',
+      'Supercharger Magic Dock CCS Compatibility',
+      'Tesla Bot Gen 2 Factory Demonstration',
+      'Model X Refresh Interior Updates',
+      'Gigafactory Texas Reaches Full Capacity',
+      'Tesla Energy Virtual Power Plant Launch',
+      'Autopilot Vision-Only System Update',
+      'Tesla Roadster SpaceX Package Details',
+      'Model Y Juniper Prototype Spotted',
+      'Tesla Phone Rumors Gain Momentum',
+      'Giga Berlin Water Usage Optimization',
+      'Tesla Wireless Charging Technology Demo'
     ];
     
     const summaries = [
-      'Tesla announces significant progress in production at the Austin Gigafactory.',
-      'Tesla begins deployment of faster charging stations across major highways.',
-      'Tesla reveals breakthrough in neural network architecture for FSD computers.',
-      'New design updates and performance improvements announced for the popular SUV.',
-      'European production facility announces major capacity expansion plans.',
-      'Latest autonomous driving software shows improved city navigation capabilities.',
-      'Revolutionary energy storage solutions for residential and commercial use.',
-      'Autonomous taxi service begins pilot program in select cities.',
-      'Advanced AI processing improvements for vehicle autonomous systems.',
-      'Next-generation battery technology promises extended range and faster charging.'
+      'Tesla achieves major production milestone with significant manufacturing improvements.',
+      'Advanced charging infrastructure deployment continues across global markets.',
+      'Breakthrough artificial intelligence developments reshape autonomous vehicle industry.',
+      'Enhanced performance specifications and design updates for popular electric SUV.',
+      'European manufacturing facility announces major capacity expansion and efficiency gains.',
+      'Latest autonomous driving software demonstrates remarkable improvements in real-world scenarios.',
+      'Revolutionary energy storage solutions transform residential and commercial applications.',
+      'Autonomous transportation service begins operations in metropolitan areas worldwide.',
+      'Advanced neural processing capabilities enable unprecedented vehicle intelligence systems.',
+      'Next-generation battery technology promises extended range and rapid charging capabilities.',
+      'High-performance electric sedan breaks multiple track records in rigorous testing.',
+      'Integrated solar roofing solution achieves cost competitiveness with traditional energy sources.',
+      'Humanoid robot platform showcases advanced manipulation and navigation capabilities.',
+      'Refreshed compact sedan receives global launch with improved efficiency and features.',
+      'Electric commercial vehicle completes extensive long-distance reliability testing program.',
+      'Large-scale energy storage manufacturing facility begins operations in international market.',
+      'Advanced processing hardware enters mass production for next-generation autonomous vehicles.',
+      'Usage-based insurance product expands availability to additional geographic regions.',
+      'Flagship pickup truck demonstrates exceptional performance capabilities in challenging conditions.',
+      'Universal charging compatibility enables broader access to Tesla charging infrastructure.',
+      'Second-generation humanoid robot demonstrates manufacturing assembly capabilities.',
+      'Luxury SUV receives interior technology updates and comfort enhancements.',
+      'Texas manufacturing facility achieves maximum production capacity ahead of schedule.',
+      'Distributed energy network connects residential and commercial storage systems.',
+      'Camera-based autonomous driving system receives significant capability improvements.',
+      'Ultra-high-performance sports car reveals advanced propulsion system details.',
+      'Next-generation SUV development program reaches advanced prototype testing phase.',
+      'Consumer electronics device speculation intensifies following recent technology patents.',
+      'Sustainable manufacturing practices reduce environmental impact at German facility.',
+      'Contactless vehicle charging technology undergoes public demonstration and testing.'
     ];
     
-    const tags = ['#Cybertruck', '#Supercharger', '#AI', '#ModelY', '#Gigafactory', '#FSD', '#Energy', '#Robotaxi', '#Neural', '#Battery'];
+    const tags = [
+      '#Cybertruck', '#Supercharger', '#AI', '#ModelY', '#Gigafactory', '#FSD', 
+      '#Energy', '#Robotaxi', '#Neural', '#Battery', '#ModelS', '#Solar', 
+      '#Optimus', '#Model3', '#Semi', '#Megapack', '#Hardware', '#Insurance',
+      '#Performance', '#Charging', '#Robot', '#ModelX', '#Texas', '#VPP',
+      '#Autopilot', '#Roadster', '#Juniper', '#Phone', '#Berlin', '#Wireless'
+    ];
     
     const sampleNews = [];
+    const baseTimestamp = Date.now();
     for (let i = 0; i < count; i++) {
       sampleNews.push({
-        id: Date.now() + i,
+        id: baseTimestamp + i * 1000, // Ensure unique IDs by adding seconds
         title: titles[i % titles.length],
         summary: summaries[i % summaries.length],
         tag: tags[i % tags.length],
@@ -266,7 +313,11 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
       });
     }
     
-    sampleNews.forEach(news => onAddNews(news));
+    if (onAddMultipleNews && sampleNews.length > 1) {
+      onAddMultipleNews(sampleNews);
+    } else {
+      sampleNews.forEach(news => onAddNews(news));
+    }
     addDebugLog('info', `Generated ${sampleNews.length} sample news items`);
     alert(`${sampleNews.length} sample news items generated!`);
   };
