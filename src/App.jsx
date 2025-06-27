@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import TeslaNewsTimeline from './TeslaNewsTimeline';
 import Login from './components/Login';
@@ -33,7 +33,10 @@ function App() {
     const saved = localStorage.getItem('teslaNewsItems');
     return saved ? JSON.parse(saved) : initialNewsItems;
   });
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    const saved = localStorage.getItem('teslaAdminLoggedIn');
+    return saved === 'true';
+  });
 
   const handleAddNews = (newNews) => {
     const updatedNews = [newNews, ...newsItems];
@@ -43,10 +46,12 @@ function App() {
 
   const handleLogin = () => {
     setIsLoggedIn(true);
+    localStorage.setItem('teslaAdminLoggedIn', 'true');
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    localStorage.removeItem('teslaAdminLoggedIn');
   };
 
   return (
@@ -54,7 +59,7 @@ function App() {
       <Routes>
         <Route 
           path="/" 
-          element={<TeslaNewsTimeline newsItems={newsItems} />} 
+          element={<TeslaNewsTimeline newsItems={newsItems} isLoggedIn={isLoggedIn} />} 
         />
         <Route 
           path="/login" 
