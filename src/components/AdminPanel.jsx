@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDeleteNews, onLogout }) {
@@ -16,6 +16,12 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
     siteTitle: 'Tesla News Timeline',
     adminPassword: 'tesla123',
     defaultTag: 'Tesla'
+  });
+  const [debugLogs, setDebugLogs] = useState([]);
+  const [debugData, setDebugData] = useState({
+    localStorage: {},
+    sessionStorage: {},
+    environment: {}
   });
 
   const handleSubmit = (e) => {
@@ -84,11 +90,161 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
     }
   };
 
+  // Debug functions
+  useEffect(() => {
+    // Capture console errors
+    const originalError = console.error;
+    const originalWarn = console.warn;
+    
+    console.error = (...args) => {
+      originalError(...args);
+      addDebugLog('error', args.join(' '));
+    };
+    
+    console.warn = (...args) => {
+      originalWarn(...args);
+      addDebugLog('warning', args.join(' '));
+    };
+    
+    // Capture unhandled errors
+    const handleError = (event) => {
+      addDebugLog('error', `Unhandled error: ${event.error?.message || event.message}`);
+    };
+    
+    window.addEventListener('error', handleError);
+    
+    // Update debug data
+    updateDebugData();
+    
+    return () => {
+      console.error = originalError;
+      console.warn = originalWarn;
+      window.removeEventListener('error', handleError);
+    };
+  }, []);
+
+  const addDebugLog = (type, message) => {
+    const newLog = {
+      id: Date.now(),
+      type,
+      message,
+      timestamp: new Date().toISOString()
+    };
+    setDebugLogs(prev => [newLog, ...prev.slice(0, 99)]); // Keep last 100 logs
+  };
+
+  const updateDebugData = () => {
+    const localStorage = {};
+    const sessionStorage = {};
+    
+    // Get localStorage data
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const key = window.localStorage.key(i);
+      try {
+        localStorage[key] = JSON.parse(window.localStorage.getItem(key));
+      } catch {
+        localStorage[key] = window.localStorage.getItem(key);
+      }
+    }
+    
+    // Get sessionStorage data
+    for (let i = 0; i < window.sessionStorage.length; i++) {
+      const key = window.sessionStorage.key(i);
+      try {
+        sessionStorage[key] = JSON.parse(window.sessionStorage.getItem(key));
+      } catch {
+        sessionStorage[key] = window.sessionStorage.getItem(key);
+      }
+    }
+    
+    const environment = {
+      userAgent: navigator.userAgent,
+      language: navigator.language,
+      cookieEnabled: navigator.cookieEnabled,
+      onLine: navigator.onLine,
+      platform: navigator.platform,
+      viewport: {
+        width: window.innerWidth,
+        height: window.innerHeight
+      },
+      screen: {
+        width: window.screen.width,
+        height: window.screen.height
+      },
+      url: window.location.href,
+      timestamp: new Date().toISOString()
+    };
+    
+    setDebugData({ localStorage, sessionStorage, environment });
+  };
+
+  const clearAllData = () => {
+    if (window.confirm('⚠️ This will clear ALL data including news items and login state. Are you sure?')) {
+      window.localStorage.clear();
+      window.sessionStorage.clear();
+      addDebugLog('info', 'All data cleared');
+      alert('All data cleared! Please refresh the page.');
+    }
+  };
+
+  const generateSampleData = () => {
+    const sampleNews = [
+      {
+        id: Date.now() + 1,
+        title: 'Tesla Cybertruck Production Update',
+        summary: 'Tesla announces significant progress in Cybertruck production at the Austin Gigafactory.',
+        tag: '#Cybertruck',
+        date: new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }),
+        youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+      },
+      {
+        id: Date.now() + 2,
+        title: 'New Supercharger V4 Rollout',
+        summary: 'Tesla begins deployment of faster Supercharger V4 stations across major highways.',
+        tag: '#Supercharger',
+        date: new Date(Date.now() - 86400000).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }),
+        youtubeUrl: ''
+      },
+      {
+        id: Date.now() + 3,
+        title: 'AI Day 2025 Announcement',
+        summary: 'Tesla reveals breakthrough in neural network architecture for FSD computers.',
+        tag: '#AI',
+        date: new Date(Date.now() - 172800000).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }),
+        youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+      }
+    ];
+    
+    sampleNews.forEach(news => onAddNews(news));
+    addDebugLog('info', `Generated ${sampleNews.length} sample news items`);
+    alert('Sample data generated!');
+  };
+
+  const exportData = () => {
+    const data = {
+      newsItems,
+      settings,
+      debugLogs: debugLogs.slice(0, 10), // Export last 10 logs
+      exportDate: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `tesla-news-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    addDebugLog('info', 'Data exported successfully');
+  };
+
   const tabs = [
     { id: 'dashboard', name: 'Dashboard', icon: '📊' },
     { id: 'news', name: 'News Management', icon: '📰' },
     { id: 'settings', name: 'Settings', icon: '⚙️' },
-    { id: 'media', name: 'Media', icon: '🎬' }
+    { id: 'media', name: 'Media', icon: '🎬' },
+    { id: 'debug', name: 'Debug', icon: '🐛' }
   ];
 
   const renderDashboard = () => (
@@ -399,6 +555,172 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
     </div>
   );
 
+  const renderDebug = () => (
+    <div className="space-y-6">
+      {/* Development Tools */}
+      <div className="bg-white rounded-lg p-6 shadow-sm">
+        <h2 className="text-xl font-bold mb-6 text-gray-800">🛠️ Development Tools</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <button
+            onClick={generateSampleData}
+            className="bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            📝 Generate Sample Data
+          </button>
+          
+          <button
+            onClick={exportData}
+            className="bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors"
+          >
+            💾 Export Data
+          </button>
+          
+          <button
+            onClick={() => {
+              updateDebugData();
+              addDebugLog('info', 'Debug data refreshed');
+            }}
+            className="bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            🔄 Refresh Data
+          </button>
+        </div>
+        
+        <div className="border-t pt-4">
+          <button
+            onClick={clearAllData}
+            className="bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 transition-colors"
+          >
+            🗑️ Clear All Data (Danger)
+          </button>
+          <p className="text-sm text-gray-600 mt-2">This will remove all news items, settings, and login state</p>
+        </div>
+      </div>
+
+      {/* Data Inspector */}
+      <div className="bg-white rounded-lg p-6 shadow-sm">
+        <h2 className="text-xl font-bold mb-6 text-gray-800">🔍 Data Inspector</h2>
+        
+        <div className="space-y-4">
+          {/* News Items */}
+          <div>
+            <h3 className="text-lg font-semibold mb-2 text-gray-700">News Items ({newsItems.length})</h3>
+            <div className="bg-gray-50 rounded-lg p-4 max-h-60 overflow-auto">
+              <pre className="text-sm text-gray-800 whitespace-pre-wrap">
+                {JSON.stringify(newsItems, null, 2)}
+              </pre>
+            </div>
+          </div>
+          
+          {/* LocalStorage */}
+          <div>
+            <h3 className="text-lg font-semibold mb-2 text-gray-700">LocalStorage</h3>
+            <div className="bg-gray-50 rounded-lg p-4 max-h-60 overflow-auto">
+              <pre className="text-sm text-gray-800 whitespace-pre-wrap">
+                {JSON.stringify(debugData.localStorage, null, 2)}
+              </pre>
+            </div>
+          </div>
+          
+          {/* SessionStorage */}
+          <div>
+            <h3 className="text-lg font-semibold mb-2 text-gray-700">SessionStorage</h3>
+            <div className="bg-gray-50 rounded-lg p-4 max-h-60 overflow-auto">
+              <pre className="text-sm text-gray-800 whitespace-pre-wrap">
+                {JSON.stringify(debugData.sessionStorage, null, 2)}
+              </pre>
+            </div>
+          </div>
+          
+          {/* Environment Info */}
+          <div>
+            <h3 className="text-lg font-semibold mb-2 text-gray-700">Environment</h3>
+            <div className="bg-gray-50 rounded-lg p-4 max-h-60 overflow-auto">
+              <pre className="text-sm text-gray-800 whitespace-pre-wrap">
+                {JSON.stringify(debugData.environment, null, 2)}
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Error Logging */}
+      <div className="bg-white rounded-lg p-6 shadow-sm">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-bold text-gray-800">📋 Error Logging</h2>
+          <div className="flex gap-2">
+            <button
+              onClick={() => addDebugLog('info', 'Test info message')}
+              className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
+            >
+              Test Info
+            </button>
+            <button
+              onClick={() => addDebugLog('warning', 'Test warning message')}
+              className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600"
+            >
+              Test Warning
+            </button>
+            <button
+              onClick={() => addDebugLog('error', 'Test error message')}
+              className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+            >
+              Test Error
+            </button>
+            <button
+              onClick={() => setDebugLogs([])}
+              className="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600"
+            >
+              Clear Logs
+            </button>
+          </div>
+        </div>
+        
+        <div className="space-y-2 max-h-96 overflow-auto">
+          {debugLogs.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <span className="text-4xl block mb-2">📝</span>
+              <p>No logs captured yet</p>
+              <p className="text-sm">Errors and warnings will appear here automatically</p>
+            </div>
+          ) : (
+            debugLogs.map((log) => (
+              <div
+                key={log.id}
+                className={`p-3 rounded-lg border-l-4 ${
+                  log.type === 'error'
+                    ? 'bg-red-50 border-red-500 text-red-800'
+                    : log.type === 'warning'
+                    ? 'bg-yellow-50 border-yellow-500 text-yellow-800'
+                    : 'bg-blue-50 border-blue-500 text-blue-800'
+                }`}
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium uppercase">{log.type}</span>
+                    <span className="text-xs text-gray-500">
+                      {new Date(log.timestamp).toLocaleTimeString()}
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-1 text-sm font-mono">{log.message}</div>
+              </div>
+            ))
+          )}
+        </div>
+        
+        <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+          <p className="text-sm text-gray-600">
+            <strong>Auto-captured:</strong> Console errors, warnings, unhandled exceptions<br/>
+            <strong>Manual:</strong> Use test buttons to simulate different log types<br/>
+            <strong>Storage:</strong> Last 100 logs are kept in memory
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -409,6 +731,8 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
         return renderSettings();
       case 'media':
         return renderMedia();
+      case 'debug':
+        return renderDebug();
       default:
         return renderDashboard();
     }
