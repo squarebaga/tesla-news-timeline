@@ -21,7 +21,8 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
   const [debugData, setDebugData] = useState({
     localStorage: {},
     sessionStorage: {},
-    environment: {}
+    environment: {},
+    performance: {}
   });
 
   const handleSubmit = (e) => {
@@ -175,7 +176,44 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
       timestamp: new Date().toISOString()
     };
     
-    setDebugData({ localStorage, sessionStorage, environment });
+    // Performance metrics
+    const performanceData = {
+      newsItemCount: newsItems.length,
+      videosCount: newsItems.filter(item => item.youtubeUrl).length,
+      memoryUsage: window.performance.memory ? {
+        used: Math.round(window.performance.memory.usedJSHeapSize / 1024 / 1024),
+        total: Math.round(window.performance.memory.totalJSHeapSize / 1024 / 1024),
+        limit: Math.round(window.performance.memory.jsHeapSizeLimit / 1024 / 1024)
+      } : 'Not available',
+      timing: window.performance.timing ? {
+        domContentLoaded: window.performance.timing.domContentLoadedEventEnd - window.performance.timing.navigationStart,
+        loadComplete: window.performance.timing.loadEventEnd - window.performance.timing.navigationStart,
+        domInteractive: window.performance.timing.domInteractive - window.performance.timing.navigationStart
+      } : 'Not available',
+      renderEstimate: {
+        domNodes: document.querySelectorAll('*').length,
+        newsComponents: newsItems.length,
+        videoEmbeds: newsItems.filter(item => item.youtubeUrl).length,
+        estimatedRenderTime: `${Math.max(newsItems.length * 2, 10)}ms`
+      },
+      recommendations: []
+    };
+    
+    // Performance recommendations
+    if (newsItems.length > 50) {
+      performanceData.recommendations.push('Consider implementing pagination (✓ Already implemented)');
+    }
+    if (newsItems.filter(item => item.youtubeUrl).length > 10) {
+      performanceData.recommendations.push('Consider lazy loading YouTube videos');
+    }
+    if (newsItems.length > 100) {
+      performanceData.recommendations.push('Consider virtual scrolling for better performance');
+    }
+    if (newsItems.length > 500) {
+      performanceData.recommendations.push('Consider server-side pagination');
+    }
+    
+    setDebugData({ localStorage, sessionStorage, environment, performance: performanceData });
   };
 
   const clearAllData = () => {
@@ -187,37 +225,60 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
     }
   };
 
-  const generateSampleData = () => {
-    const sampleNews = [
-      {
-        id: Date.now() + 1,
-        title: 'Tesla Cybertruck Production Update',
-        summary: 'Tesla announces significant progress in Cybertruck production at the Austin Gigafactory.',
-        tag: '#Cybertruck',
-        date: new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }),
-        youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-      },
-      {
-        id: Date.now() + 2,
-        title: 'New Supercharger V4 Rollout',
-        summary: 'Tesla begins deployment of faster Supercharger V4 stations across major highways.',
-        tag: '#Supercharger',
-        date: new Date(Date.now() - 86400000).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }),
-        youtubeUrl: ''
-      },
-      {
-        id: Date.now() + 3,
-        title: 'AI Day 2025 Announcement',
-        summary: 'Tesla reveals breakthrough in neural network architecture for FSD computers.',
-        tag: '#AI',
-        date: new Date(Date.now() - 172800000).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }),
-        youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-      }
+  const generateSampleData = (count = 3) => {
+    const titles = [
+      'Tesla Cybertruck Production Update',
+      'New Supercharger V4 Rollout',
+      'AI Day 2025 Announcement',
+      'Model Y Refresh Details',
+      'Gigafactory Berlin Expansion',
+      'FSD Beta V12 Release',
+      'Tesla Energy Storage Breakthrough',
+      'Robotaxi Network Launch',
+      'Neural Network Architecture Update',
+      'Battery Day Innovations'
     ];
+    
+    const summaries = [
+      'Tesla announces significant progress in production at the Austin Gigafactory.',
+      'Tesla begins deployment of faster charging stations across major highways.',
+      'Tesla reveals breakthrough in neural network architecture for FSD computers.',
+      'New design updates and performance improvements announced for the popular SUV.',
+      'European production facility announces major capacity expansion plans.',
+      'Latest autonomous driving software shows improved city navigation capabilities.',
+      'Revolutionary energy storage solutions for residential and commercial use.',
+      'Autonomous taxi service begins pilot program in select cities.',
+      'Advanced AI processing improvements for vehicle autonomous systems.',
+      'Next-generation battery technology promises extended range and faster charging.'
+    ];
+    
+    const tags = ['#Cybertruck', '#Supercharger', '#AI', '#ModelY', '#Gigafactory', '#FSD', '#Energy', '#Robotaxi', '#Neural', '#Battery'];
+    
+    const sampleNews = [];
+    for (let i = 0; i < count; i++) {
+      sampleNews.push({
+        id: Date.now() + i,
+        title: titles[i % titles.length],
+        summary: summaries[i % summaries.length],
+        tag: tags[i % tags.length],
+        date: new Date(Date.now() - (i * 86400000)).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }),
+        youtubeUrl: i % 3 === 0 ? 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' : ''
+      });
+    }
     
     sampleNews.forEach(news => onAddNews(news));
     addDebugLog('info', `Generated ${sampleNews.length} sample news items`);
-    alert('Sample data generated!');
+    alert(`${sampleNews.length} sample news items generated!`);
+  };
+
+  const generatePerformanceTestData = () => {
+    if (window.confirm('This will generate 100 news items for performance testing. Continue?')) {
+      generateSampleData(100);
+      setTimeout(() => {
+        updateDebugData();
+        addDebugLog('info', 'Performance test data generated - check performance metrics');
+      }, 1000);
+    }
   };
 
   const exportData = () => {
@@ -561,12 +622,19 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
       <div className="bg-white rounded-lg p-6 shadow-sm">
         <h2 className="text-xl font-bold mb-6 text-gray-800">⚙ Development Tools</h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <button
-            onClick={generateSampleData}
+            onClick={() => generateSampleData(3)}
             className="bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
             + Generate Sample Data
+          </button>
+          
+          <button
+            onClick={generatePerformanceTestData}
+            className="bg-orange-600 text-white px-4 py-3 rounded-lg hover:bg-orange-700 transition-colors"
+          >
+            ⚡ Performance Test (100 items)
           </button>
           
           <button
@@ -641,6 +709,26 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
                 {JSON.stringify(debugData.environment, null, 2)}
               </pre>
             </div>
+          </div>
+          
+          {/* Performance Metrics */}
+          <div>
+            <h3 className="text-lg font-semibold mb-2 text-gray-700">Performance Metrics</h3>
+            <div className="bg-gray-50 rounded-lg p-4 max-h-60 overflow-auto">
+              <pre className="text-sm text-gray-800 whitespace-pre-wrap">
+                {JSON.stringify(debugData.performance, null, 2)}
+              </pre>
+            </div>
+            {debugData.performance?.recommendations?.length > 0 && (
+              <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <h4 className="font-semibold text-yellow-800 mb-2">Performance Recommendations:</h4>
+                <ul className="text-sm text-yellow-700 space-y-1">
+                  {debugData.performance.recommendations.map((rec, index) => (
+                    <li key={index}>• {rec}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       </div>
