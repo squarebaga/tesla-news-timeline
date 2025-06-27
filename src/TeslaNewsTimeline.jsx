@@ -1,34 +1,20 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom';
 
-const newsItems = [
-  {
-    date: "06/27/2025",
-    tag: "#Autopilot",
-    title: "Tesla Expands Full Self-Driving Beta Program",
-    summary:
-      "Tesla has announced an expansion of its Full Self-Driving (FSD) beta program, allowing more users to access the latest features."
-  },
-  {
-    date: "06/25/2025",
-    tag: "#BatteryTech",
-    title: "New Tesla Battery Technology Improves Range",
-    summary:
-      "Tesla has unveiled a new battery technology aimed at significantly improving range of its electric vehicles."
-  },
-  {
-    date: "06/23/2025",
-    tag: "#Supercharger",
-    title: "Tesla Opens New Supercharger Stations in Europe",
-    summary:
-      "Tesla has opened several new Supercharger stations across Europe to support growing EV demand."
-  }
-];
-
-export default function TeslaNewsTimeline() {
+export default function TeslaNewsTimeline({ newsItems }) {
+  const navigate = useNavigate();
   return (
     <div className="bg-red-700 min-h-screen p-6 text-white font-sans">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">TeslaNews Timeline</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">TeslaNews Timeline</h1>
+          <button
+            onClick={() => navigate('/login')}
+            className="bg-white text-red-700 px-4 py-2 rounded hover:bg-gray-100 transition-colors text-sm font-medium"
+          >
+            Admin Login
+          </button>
+        </div>
         <div className="relative border-l-2 border-white pl-6">
           {newsItems.map((item, index) => (
             <div key={index} className="mb-12 relative">

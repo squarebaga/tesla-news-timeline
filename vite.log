@@ -1,0 +1,15 @@
+
+> tesla-news-timeline@0.0.1 dev
+> vite
+
+
+  VITE v4.5.14  ready in 141 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+上午2:53:45 [vite] page reload src/TeslaNewsTimeline.jsx
+上午2:53:47 [vite] ✨ new dependencies optimized: react-router-dom
+上午2:53:47 [vite] ✨ optimized dependencies changed. reloading
+上午2:53:56 [vite] page reload src/TeslaNewsTimeline.jsx
+上午2:54:15 [vite] page reload src/App.jsx
+上午2:54:47 [vite] page reload src/main.jsx
