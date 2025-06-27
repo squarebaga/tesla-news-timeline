@@ -240,11 +240,11 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
   };
 
   const tabs = [
-    { id: 'dashboard', name: 'Dashboard', icon: '📊' },
-    { id: 'news', name: 'News Management', icon: '📰' },
-    { id: 'settings', name: 'Settings', icon: '⚙️' },
-    { id: 'media', name: 'Media', icon: '🎬' },
-    { id: 'debug', name: 'Debug', icon: '🐛' }
+    { id: 'dashboard', name: 'Dashboard', icon: '□' },
+    { id: 'news', name: 'News Management', icon: '+' },
+    { id: 'settings', name: 'Settings', icon: '⚙' },
+    { id: 'media', name: 'Media', icon: '▶' },
+    { id: 'debug', name: 'Debug', icon: '◇' }
   ];
 
   const renderDashboard = () => (
@@ -253,7 +253,7 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
         <div className="bg-white rounded-lg p-6 shadow-sm">
           <div className="flex items-center">
             <div className="p-2 bg-blue-100 rounded-lg">
-              <span className="text-2xl">📰</span>
+              <span className="text-2xl font-bold text-blue-600">+</span>
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total News</p>
@@ -265,7 +265,7 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
         <div className="bg-white rounded-lg p-6 shadow-sm">
           <div className="flex items-center">
             <div className="p-2 bg-green-100 rounded-lg">
-              <span className="text-2xl">🎬</span>
+              <span className="text-2xl font-bold text-green-600">▶</span>
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">With Videos</p>
@@ -279,7 +279,7 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
         <div className="bg-white rounded-lg p-6 shadow-sm">
           <div className="flex items-center">
             <div className="p-2 bg-purple-100 rounded-lg">
-              <span className="text-2xl">📅</span>
+              <span className="text-2xl font-bold text-purple-600">□</span>
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">This Month</p>
@@ -447,7 +447,7 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
               </div>
               <p className="text-sm text-gray-600 mb-2">{item.summary}</p>
               {item.youtubeUrl && (
-                <div className="text-xs text-blue-600">📹 Has Video</div>
+                <div className="text-xs text-blue-600">▶ Has Video</div>
               )}
             </div>
           ))}
@@ -510,7 +510,7 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
           {newsItems.filter(item => item.youtubeUrl).map((item, index) => (
             <div key={item.id || index} className="border rounded-lg p-4">
               <div className="aspect-video bg-gray-100 rounded mb-3 flex items-center justify-center">
-                <span className="text-4xl">🎬</span>
+                <span className="text-4xl font-bold text-gray-600">▶</span>
               </div>
               <h3 className="font-semibold text-sm mb-1">{item.title}</h3>
               <p className="text-xs text-gray-600 mb-2">{item.date}</p>
@@ -528,7 +528,7 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
         
         {newsItems.filter(item => item.youtubeUrl).length === 0 && (
           <div className="text-center py-8 text-gray-500">
-            <span className="text-4xl block mb-2">📹</span>
+            <span className="text-4xl block mb-2 font-bold">▶</span>
             <p>No YouTube videos found</p>
             <p className="text-sm">Add YouTube URLs to your news items to see them here</p>
           </div>
@@ -559,21 +559,21 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
     <div className="space-y-6">
       {/* Development Tools */}
       <div className="bg-white rounded-lg p-6 shadow-sm">
-        <h2 className="text-xl font-bold mb-6 text-gray-800">🛠️ Development Tools</h2>
+        <h2 className="text-xl font-bold mb-6 text-gray-800">⚙ Development Tools</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <button
             onClick={generateSampleData}
             className="bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
-            📝 Generate Sample Data
+            + Generate Sample Data
           </button>
           
           <button
             onClick={exportData}
             className="bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors"
           >
-            💾 Export Data
+            ↓ Export Data
           </button>
           
           <button
@@ -583,7 +583,7 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
             }}
             className="bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors"
           >
-            🔄 Refresh Data
+            ↻ Refresh Data
           </button>
         </div>
         
@@ -592,7 +592,7 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
             onClick={clearAllData}
             className="bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 transition-colors"
           >
-            🗑️ Clear All Data (Danger)
+            × Clear All Data (Danger)
           </button>
           <p className="text-sm text-gray-600 mt-2">This will remove all news items, settings, and login state</p>
         </div>
@@ -600,7 +600,7 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
 
       {/* Data Inspector */}
       <div className="bg-white rounded-lg p-6 shadow-sm">
-        <h2 className="text-xl font-bold mb-6 text-gray-800">🔍 Data Inspector</h2>
+        <h2 className="text-xl font-bold mb-6 text-gray-800">◇ Data Inspector</h2>
         
         <div className="space-y-4">
           {/* News Items */}
@@ -648,7 +648,7 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
       {/* Error Logging */}
       <div className="bg-white rounded-lg p-6 shadow-sm">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-800">📋 Error Logging</h2>
+          <h2 className="text-xl font-bold text-gray-800">□ Error Logging</h2>
           <div className="flex gap-2">
             <button
               onClick={() => addDebugLog('info', 'Test info message')}
@@ -680,7 +680,7 @@ export default function AdminPanel({ newsItems, onAddNews, onUpdateNews, onDelet
         <div className="space-y-2 max-h-96 overflow-auto">
           {debugLogs.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              <span className="text-4xl block mb-2">📝</span>
+              <span className="text-4xl block mb-2 font-bold">□</span>
               <p>No logs captured yet</p>
               <p className="text-sm">Errors and warnings will appear here automatically</p>
             </div>
