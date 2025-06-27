@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from 'react-router-dom';
 
-function LazyYouTubeEmbed({ url }) {
+const LazyYouTubeEmbed = React.memo(({ url }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef();
@@ -14,7 +14,7 @@ function LazyYouTubeEmbed({ url }) {
           observer.disconnect();
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.2 } // Higher threshold for better performance
     );
 
     if (ref.current) {
@@ -66,21 +66,24 @@ function LazyYouTubeEmbed({ url }) {
       )}
     </div>
   );
-}
+});
 
-// Virtual scrolling news item component
-function VirtualNewsItem({ item, index }) {
+// Optimized virtual scrolling news item component with memoization
+const VirtualNewsItem = React.memo(({ item, index }) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsVisible(entry.isIntersecting);
+        // Debounce visibility changes to reduce re-renders
+        if (entry.isIntersecting !== isVisible) {
+          setIsVisible(entry.isIntersecting);
+        }
       },
       { 
-        threshold: 0.1,
-        rootMargin: '100px 0px' // Load items 100px before they come into view
+        threshold: 0.05, // Reduced threshold for better performance
+        rootMargin: '50px 0px' // Reduced margin to load less content ahead
       }
     );
 
@@ -89,27 +92,27 @@ function VirtualNewsItem({ item, index }) {
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [isVisible]); // Add dependency to prevent unnecessary re-observations
 
   return (
-    <div ref={ref} className="mb-8 relative min-h-[200px] group">
-      {/* Timeline marker with enhanced design */}
-      <div className="absolute left-[-16px] top-6 w-4 h-4 bg-gradient-to-br from-white to-red-100 rounded-full shadow-lg border-2 border-red-400/30 transition-all duration-300 group-hover:scale-125 group-hover:shadow-xl group-hover:border-white"></div>
+    <div ref={ref} className="mb-8 relative min-h-[200px]">
+      {/* Simplified timeline marker for better performance */}
+      <div className="absolute left-[-16px] top-6 w-4 h-4 bg-white rounded-full border-2 border-red-400/50"></div>
       
       {isVisible ? (
-        <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-xl transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:scale-[1.02] hover:-translate-y-1">
+        <div className="bg-white/5 rounded-2xl border border-white/10 p-6 will-change-transform hover:bg-white/8 hover:border-white/15 transition-colors duration-200">
           {/* Header with date and tag */}
           <div className="flex flex-wrap items-center gap-3 mb-4">
-            <time className="text-sm font-medium text-white/80 bg-white/10 px-3 py-1.5 rounded-full border border-white/20">
+            <time className="text-sm font-medium text-white/80 bg-white/10 px-3 py-1.5 rounded-full">
               📅 {item.date}
             </time>
-            <span className="text-xs font-bold text-white bg-gradient-to-r from-red-500 to-red-600 px-3 py-1.5 rounded-full shadow-lg border border-red-400/30">
+            <span className="text-xs font-bold text-white bg-red-600 px-3 py-1.5 rounded-full">
               {item.tag}
             </span>
           </div>
           
           {/* Title with better typography */}
-          <h2 className="text-xl font-bold text-white mb-3 leading-tight group-hover:text-red-100 transition-colors duration-300">
+          <h2 className="text-xl font-bold text-white mb-3 leading-tight">
             {item.title}
           </h2>
           
@@ -121,29 +124,25 @@ function VirtualNewsItem({ item, index }) {
           {/* YouTube embed */}
           {item.youtubeUrl && <LazyYouTubeEmbed url={item.youtubeUrl} />}
           
-          {/* Enhanced read more button */}
+          {/* Simplified read more section */}
           <div className="flex justify-between items-center mt-6 pt-4 border-t border-white/10">
             <a 
               href="#" 
-              className="inline-flex items-center gap-2 text-white/90 hover:text-white font-medium text-sm bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition-all duration-200 border border-white/20 hover:border-white/30 group/link"
+              className="inline-flex items-center gap-2 text-white/90 hover:text-white font-medium text-sm bg-white/10 hover:bg-white/15 px-4 py-2 rounded-xl transition-colors duration-150"
             >
               <span>Read More</span>
-              <svg className="w-4 h-4 transition-transform duration-200 group-hover/link:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
+              <span>→</span>
             </a>
             
-            {/* Share button */}
-            <button className="inline-flex items-center gap-2 text-white/70 hover:text-white/90 text-sm px-3 py-2 rounded-xl hover:bg-white/10 transition-all duration-200">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-              </svg>
+            {/* Simplified share button */}
+            <button className="inline-flex items-center gap-2 text-white/70 hover:text-white/90 text-sm px-3 py-2 rounded-xl hover:bg-white/10 transition-colors duration-150">
+              <span>⚡</span>
               Share
             </button>
           </div>
         </div>
       ) : (
-        <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-xl animate-pulse">
+        <div className="bg-white/5 rounded-2xl border border-white/10 p-6 animate-pulse">
           <div className="flex gap-3 mb-4">
             <div className="h-6 bg-white/20 rounded-full w-24"></div>
             <div className="h-6 bg-white/20 rounded-full w-20"></div>
@@ -158,7 +157,7 @@ function VirtualNewsItem({ item, index }) {
       )}
     </div>
   );
-}
+});
 
 export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
   const navigate = useNavigate();
@@ -253,22 +252,30 @@ export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
     }
   }, [jumpToIndex]);
 
-  // Infinite scroll effect
+  // Optimized infinite scroll effect with throttling
   useEffect(() => {
+    let timeoutId;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && visibleCount < newsItems.length) {
-          setVisibleCount(prev => Math.min(prev + 10, newsItems.length));
+          // Throttle the scroll loading to reduce rapid re-renders
+          if (timeoutId) clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => {
+            setVisibleCount(prev => Math.min(prev + 15, newsItems.length)); // Load more items at once
+          }, 100); // Small delay to batch multiple scroll events
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.3 } // Higher threshold to load less aggressively
     );
 
     if (loadMoreRef.current) {
       observer.observe(loadMoreRef.current);
     }
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [visibleCount, newsItems.length]);
 
   // Reset visible count when newsItems change significantly
