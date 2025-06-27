@@ -7,7 +7,8 @@ export default function AdminPanel({ newsItems, onAddNews, onLogout }) {
     title: '',
     summary: '',
     tag: '',
-    date: new Date().toISOString().split('T')[0]
+    date: new Date().toISOString().split('T')[0],
+    youtubeUrl: ''
   });
 
   const handleSubmit = (e) => {
@@ -22,7 +23,8 @@ export default function AdminPanel({ newsItems, onAddNews, onLogout }) {
         month: '2-digit',
         day: '2-digit',
         year: 'numeric'
-      })
+      }),
+      youtubeUrl: formData.youtubeUrl
     };
     
     onAddNews(newNews);
@@ -32,7 +34,8 @@ export default function AdminPanel({ newsItems, onAddNews, onLogout }) {
       title: '',
       summary: '',
       tag: '',
-      date: new Date().toISOString().split('T')[0]
+      date: new Date().toISOString().split('T')[0],
+      youtubeUrl: ''
     });
     
     alert('News added successfully!');
@@ -114,7 +117,7 @@ export default function AdminPanel({ newsItems, onAddNews, onLogout }) {
                 />
               </div>
               
-              <div className="mb-6">
+              <div className="mb-4">
                 <label className="block text-sm font-bold mb-2">Date</label>
                 <input
                   type="date"
@@ -123,6 +126,18 @@ export default function AdminPanel({ newsItems, onAddNews, onLogout }) {
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
                   required
+                />
+              </div>
+              
+              <div className="mb-6">
+                <label className="block text-sm font-bold mb-2">YouTube URL (Optional)</label>
+                <input
+                  type="url"
+                  name="youtubeUrl"
+                  value={formData.youtubeUrl}
+                  onChange={handleChange}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
                 />
               </div>
               

@@ -10,7 +10,8 @@ const initialNewsItems = [
     date: "06/27/2025",
     tag: "#Autopilot",
     title: "Tesla Expands Full Self-Driving Beta Program",
-    summary: "Tesla has announced an expansion of its Full Self-Driving (FSD) beta program, allowing more users to access the latest features."
+    summary: "Tesla has announced an expansion of its Full Self-Driving (FSD) beta program, allowing more users to access the latest features.",
+    youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
   },
   {
     id: 2,
