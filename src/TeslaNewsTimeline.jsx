@@ -118,8 +118,96 @@ function VirtualNewsItem({ item, index }) {
 
 export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
   const navigate = useNavigate();
-  const [visibleCount, setVisibleCount] = useState(20); // Start with 20 items
+  const [visibleCount, setVisibleCount] = useState(20);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [jumpToIndex, setJumpToIndex] = useState(null);
   const loadMoreRef = useRef();
+  const timelineRef = useRef();
+
+  // Create month index for quick lookups
+  const monthIndex = useMemo(() => {
+    const index = new Map();
+    const monthStats = new Map();
+    
+    newsItems.forEach((item, idx) => {
+      const date = new Date(item.date);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      
+      if (!index.has(monthKey)) {
+        index.set(monthKey, []);
+      }
+      index.set(monthKey, [...index.get(monthKey), { item, index: idx }]);
+      
+      // Count items per month
+      monthStats.set(monthKey, (monthStats.get(monthKey) || 0) + 1);
+    });
+    
+    return { index, monthStats };
+  }, [newsItems]);
+
+  // Get available months sorted
+  const availableMonths = useMemo(() => {
+    return Array.from(monthIndex.monthStats.keys()).sort((a, b) => {
+      return new Date(b + '-01') - new Date(a + '-01'); // Most recent first
+    });
+  }, [monthIndex]);
+
+  // Date range info
+  const dateRange = useMemo(() => {
+    if (newsItems.length === 0) return null;
+    const dates = newsItems.map(item => new Date(item.date)).sort((a, b) => a - b);
+    return {
+      earliest: dates[0].toLocaleDateString(),
+      latest: dates[dates.length - 1].toLocaleDateString(),
+      span: Math.ceil((dates[dates.length - 1] - dates[0]) / (1000 * 60 * 60 * 24))
+    };
+  }, [newsItems]);
+
+  // Jump to specific month
+  const jumpToMonth = useCallback((targetMonth) => {
+    if (!targetMonth || !monthIndex.index.has(targetMonth)) return;
+    
+    const firstItemForMonth = monthIndex.index.get(targetMonth)[0];
+    const targetIndex = firstItemForMonth.index;
+    
+    // Ensure enough items are visible
+    if (targetIndex >= visibleCount) {
+      setVisibleCount(Math.max(targetIndex + 10, visibleCount));
+    }
+    
+    setJumpToIndex(targetIndex);
+    setSelectedDate(targetMonth);
+  }, [monthIndex, visibleCount]);
+
+  // Scroll to target item when jumpToIndex changes
+  useEffect(() => {
+    if (jumpToIndex !== null && timelineRef.current) {
+      const timelineItems = timelineRef.current.children;
+      if (timelineItems[jumpToIndex]) {
+        timelineItems[jumpToIndex].scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+        
+        // Highlight the target item temporarily
+        const targetElement = timelineItems[jumpToIndex];
+        targetElement.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        targetElement.style.borderRadius = '8px';
+        targetElement.style.padding = '16px';
+        targetElement.style.marginLeft = '-16px';
+        targetElement.style.marginRight = '-16px';
+        
+        setTimeout(() => {
+          targetElement.style.backgroundColor = '';
+          targetElement.style.borderRadius = '';
+          targetElement.style.padding = '';
+          targetElement.style.marginLeft = '';
+          targetElement.style.marginRight = '';
+        }, 2000);
+      }
+      setJumpToIndex(null);
+    }
+  }, [jumpToIndex]);
 
   // Infinite scroll effect
   useEffect(() => {
@@ -142,6 +230,7 @@ export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
   // Reset visible count when newsItems change significantly
   useEffect(() => {
     setVisibleCount(20);
+    setSelectedDate('');
   }, [newsItems.length]);
 
   const visibleItems = useMemo(() => 
@@ -169,6 +258,61 @@ export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
             </button>
           )}
         </div>
+
+        {/* Month Navigation */}
+        {newsItems.length > 0 && (
+          <div className="mb-6 p-4 bg-white/10 rounded-lg">
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+              <div className="flex-1">
+                <label className="block text-sm font-medium mb-2">Jump to Month:</label>
+                <select
+                  value={selectedDate}
+                  onChange={(e) => jumpToMonth(e.target.value)}
+                  className="bg-white text-red-700 px-3 py-2 rounded text-sm border-0 focus:ring-2 focus:ring-white/50 w-full sm:w-auto min-w-[200px]"
+                >
+                  <option value="">Select a month...</option>
+                  {availableMonths.map(month => (
+                    <option key={month} value={month}>
+                      {new Date(month + '-01').toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long'
+                      })} ({monthIndex.monthStats.get(month)} news)
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              {dateRange && (
+                <div className="text-sm text-white/80">
+                  <div className="text-xs uppercase tracking-wide mb-1">Timeline Span</div>
+                  <div>{dateRange.earliest} → {dateRange.latest}</div>
+                  <div className="text-xs text-white/60">{dateRange.span} days • {newsItems.length} total news</div>
+                </div>
+              )}
+            </div>
+            
+            {/* Quick month buttons for recent months */}
+            {availableMonths.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="text-xs text-white/70 self-center mr-2">Quick jump:</span>
+                {availableMonths.slice(0, 6).map(month => (
+                  <button
+                    key={month}
+                    onClick={() => jumpToMonth(month)}
+                    className={`px-3 py-1 text-xs rounded transition-colors ${
+                      selectedDate === month
+                        ? 'bg-white text-red-700 font-medium'
+                        : 'bg-white/20 text-white hover:bg-white/30'
+                    }`}
+                  >
+                    {new Date(month + '-01').toLocaleDateString('en-US', { month: 'short', year: '2-digit' })}
+                    <span className="ml-1 text-[10px]">({monthIndex.monthStats.get(month)})</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
         
         {/* Performance Stats */}
         {newsItems.length > 20 && (
@@ -177,7 +321,7 @@ export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
           </div>
         )}
         
-        <div className="relative border-l-2 border-white pl-6">
+        <div ref={timelineRef} className="relative border-l-2 border-white pl-6">
           {visibleItems.map((item, index) => (
             <VirtualNewsItem key={item.id || index} item={item} index={index} />
           ))}
