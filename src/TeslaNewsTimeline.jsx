@@ -92,24 +92,68 @@ function VirtualNewsItem({ item, index }) {
   }, []);
 
   return (
-    <div ref={ref} className="mb-12 relative min-h-[200px]">
-      <div className="absolute left-[-12px] top-1 w-3 h-3 bg-white rounded-full"></div>
+    <div ref={ref} className="mb-8 relative min-h-[200px] group">
+      {/* Timeline marker with enhanced design */}
+      <div className="absolute left-[-16px] top-6 w-4 h-4 bg-gradient-to-br from-white to-red-100 rounded-full shadow-lg border-2 border-red-400/30 transition-all duration-300 group-hover:scale-125 group-hover:shadow-xl group-hover:border-white"></div>
+      
       {isVisible ? (
-        <>
-          <p className="text-sm text-white/70">
-            {item.date} <span className="ml-2 text-xs font-medium bg-white/10 px-2 py-1 rounded">{item.tag}</span>
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-xl transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:scale-[1.02] hover:-translate-y-1">
+          {/* Header with date and tag */}
+          <div className="flex flex-wrap items-center gap-3 mb-4">
+            <time className="text-sm font-medium text-white/80 bg-white/10 px-3 py-1.5 rounded-full border border-white/20">
+              📅 {item.date}
+            </time>
+            <span className="text-xs font-bold text-white bg-gradient-to-r from-red-500 to-red-600 px-3 py-1.5 rounded-full shadow-lg border border-red-400/30">
+              {item.tag}
+            </span>
+          </div>
+          
+          {/* Title with better typography */}
+          <h2 className="text-xl font-bold text-white mb-3 leading-tight group-hover:text-red-100 transition-colors duration-300">
+            {item.title}
+          </h2>
+          
+          {/* Summary with improved readability */}
+          <p className="text-white/90 leading-relaxed mb-4 text-sm">
+            {item.summary}
           </p>
-          <h2 className="text-xl font-semibold mt-2">{item.title}</h2>
-          <p className="text-white/90 mt-1">{item.summary}</p>
+          
+          {/* YouTube embed */}
           {item.youtubeUrl && <LazyYouTubeEmbed url={item.youtubeUrl} />}
-          <a href="#" className="text-white underline mt-2 inline-block">Read More</a>
-        </>
+          
+          {/* Enhanced read more button */}
+          <div className="flex justify-between items-center mt-6 pt-4 border-t border-white/10">
+            <a 
+              href="#" 
+              className="inline-flex items-center gap-2 text-white/90 hover:text-white font-medium text-sm bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition-all duration-200 border border-white/20 hover:border-white/30 group/link"
+            >
+              <span>Read More</span>
+              <svg className="w-4 h-4 transition-transform duration-200 group-hover/link:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
+            
+            {/* Share button */}
+            <button className="inline-flex items-center gap-2 text-white/70 hover:text-white/90 text-sm px-3 py-2 rounded-xl hover:bg-white/10 transition-all duration-200">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+              </svg>
+              Share
+            </button>
+          </div>
+        </div>
       ) : (
-        <div className="animate-pulse">
-          <div className="h-4 bg-white/20 rounded w-32 mb-2"></div>
-          <div className="h-6 bg-white/20 rounded w-3/4 mb-2"></div>
-          <div className="h-4 bg-white/20 rounded w-full mb-1"></div>
-          <div className="h-4 bg-white/20 rounded w-2/3"></div>
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-xl animate-pulse">
+          <div className="flex gap-3 mb-4">
+            <div className="h-6 bg-white/20 rounded-full w-24"></div>
+            <div className="h-6 bg-white/20 rounded-full w-20"></div>
+          </div>
+          <div className="h-7 bg-white/20 rounded-lg w-3/4 mb-3"></div>
+          <div className="space-y-2 mb-4">
+            <div className="h-4 bg-white/20 rounded w-full"></div>
+            <div className="h-4 bg-white/20 rounded w-2/3"></div>
+          </div>
+          <div className="h-10 bg-white/20 rounded-xl w-32"></div>
         </div>
       )}
     </div>
@@ -238,79 +282,104 @@ export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
     [newsItems, visibleCount]
   );
   return (
-    <div className="bg-red-700 min-h-screen p-6 text-white font-sans">
-      <div className="max-w-2xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">TeslaNews Timeline</h1>
-          {!isLoggedIn ? (
-            <button
-              onClick={() => navigate('/login')}
-              className="bg-white text-red-700 px-4 py-2 rounded hover:bg-gray-100 transition-colors text-sm font-medium"
-            >
-              Admin Login
-            </button>
-          ) : (
-            <button
-              onClick={() => navigate('/admin')}
-              className="bg-white text-red-700 px-4 py-2 rounded hover:bg-gray-100 transition-colors text-sm font-medium"
-            >
-              Admin Panel
-            </button>
-          )}
+    <div className="bg-gradient-to-br from-red-700 via-red-600 to-red-800 min-h-screen text-white font-sans">
+      {/* Header Section */}
+      <div className="bg-black/20 backdrop-blur-sm border-b border-white/10">
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-white to-red-100 bg-clip-text text-transparent">
+                Tesla News
+              </h1>
+              <p className="text-lg text-white/80 mt-2">Latest updates from the Tesla ecosystem</p>
+            </div>
+            {!isLoggedIn ? (
+              <button
+                onClick={() => navigate('/login')}
+                className="bg-white/10 backdrop-blur-sm text-white px-6 py-3 rounded-xl hover:bg-white/20 transition-all duration-200 text-sm font-medium border border-white/20 shadow-lg"
+              >
+                Admin Login
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate('/admin')}
+                className="bg-white text-red-700 px-6 py-3 rounded-xl hover:bg-gray-100 transition-all duration-200 text-sm font-medium shadow-lg"
+              >
+                Admin Panel
+              </button>
+            )}
+          </div>
         </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-6 py-8">
 
         {/* Month Navigation */}
         {newsItems.length > 0 && (
-          <div className="mb-6 p-4 bg-white/10 rounded-lg">
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-              <div className="flex-1">
-                <label className="block text-sm font-medium mb-2">Jump to Month:</label>
-                <select
-                  value={selectedDate}
-                  onChange={(e) => jumpToMonth(e.target.value)}
-                  className="bg-white text-red-700 px-3 py-2 rounded text-sm border-0 focus:ring-2 focus:ring-white/50 w-full sm:w-auto min-w-[200px]"
-                >
-                  <option value="">Select a month...</option>
-                  {availableMonths.map(month => (
-                    <option key={month} value={month}>
-                      {new Date(month + '-01').toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'long'
-                      })} ({monthIndex.monthStats.get(month)} news)
-                    </option>
-                  ))}
-                </select>
-              </div>
-              
-              {dateRange && (
-                <div className="text-sm text-white/80">
-                  <div className="text-xs uppercase tracking-wide mb-1">Timeline Span</div>
-                  <div>{dateRange.earliest} → {dateRange.latest}</div>
-                  <div className="text-xs text-white/60">{dateRange.span} days • {newsItems.length} total news</div>
+          <div className="mb-8 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+            <div className="p-6">
+              <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
+                <div className="flex-1 space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold mb-3 text-white/90 flex items-center gap-2">
+                      <span className="text-lg">📅</span>
+                      Navigate Timeline
+                    </label>
+                    <select
+                      value={selectedDate}
+                      onChange={(e) => jumpToMonth(e.target.value)}
+                      className="bg-white/10 backdrop-blur-sm text-white px-4 py-3 rounded-xl text-sm border border-white/20 focus:ring-2 focus:ring-white/30 focus:border-white/40 w-full sm:w-auto min-w-[250px] transition-all duration-200"
+                    >
+                      <option value="" className="text-gray-800">Select a month...</option>
+                      {availableMonths.map(month => (
+                        <option key={month} value={month} className="text-gray-800">
+                          {new Date(month + '-01').toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'long'
+                          })} ({monthIndex.monthStats.get(month)} news)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  {/* Quick month buttons */}
+                  {availableMonths.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      <span className="text-xs text-white/60 self-center mr-2 font-medium">Quick:</span>
+                      {availableMonths.slice(0, 6).map(month => (
+                        <button
+                          key={month}
+                          onClick={() => jumpToMonth(month)}
+                          className={`px-3 py-2 text-xs rounded-lg transition-all duration-200 font-medium ${
+                            selectedDate === month
+                              ? 'bg-white text-red-700 shadow-lg scale-105'
+                              : 'bg-white/10 text-white hover:bg-white/20 hover:scale-105 border border-white/20'
+                          }`}
+                        >
+                          {new Date(month + '-01').toLocaleDateString('en-US', { month: 'short', year: '2-digit' })}
+                          <span className="ml-1 text-[10px] opacity-70">({monthIndex.monthStats.get(month)})</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            
-            {/* Quick month buttons for recent months */}
-            {availableMonths.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-2">
-                <span className="text-xs text-white/70 self-center mr-2">Quick jump:</span>
-                {availableMonths.slice(0, 6).map(month => (
-                  <button
-                    key={month}
-                    onClick={() => jumpToMonth(month)}
-                    className={`px-3 py-1 text-xs rounded transition-colors ${
-                      selectedDate === month
-                        ? 'bg-white text-red-700 font-medium'
-                        : 'bg-white/20 text-white hover:bg-white/30'
-                    }`}
-                  >
-                    {new Date(month + '-01').toLocaleDateString('en-US', { month: 'short', year: '2-digit' })}
-                    <span className="ml-1 text-[10px]">({monthIndex.monthStats.get(month)})</span>
-                  </button>
-                ))}
+                
+                {dateRange && (
+                  <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <div className="text-xs uppercase tracking-wide mb-2 text-white/60 font-bold flex items-center gap-1">
+                      <span>📊</span>
+                      Timeline Stats
+                    </div>
+                    <div className="text-sm font-semibold text-white mb-1">{dateRange.earliest} → {dateRange.latest}</div>
+                    <div className="text-xs text-white/70">
+                      <span className="bg-white/10 px-2 py-1 rounded-full mr-2">{dateRange.span} days</span>
+                      <span className="bg-white/10 px-2 py-1 rounded-full">{newsItems.length} news</span>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         )}
         
@@ -321,27 +390,35 @@ export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
           </div>
         )}
         
-        <div ref={timelineRef} className="relative border-l-2 border-white pl-6">
-          {visibleItems.map((item, index) => (
-            <VirtualNewsItem key={item.id || index} item={item} index={index} />
-          ))}
+        <div ref={timelineRef} className="relative">
+          {/* Enhanced timeline line */}
+          <div className="absolute left-2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-white/80 via-white/40 to-white/20 rounded-full shadow-sm"></div>
           
-          {/* Infinite scroll trigger */}
-          {visibleCount < newsItems.length && (
-            <div ref={loadMoreRef} className="py-8 text-center">
-              <div className="inline-flex items-center gap-2 text-white/60 text-sm">
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                Loading more news...
+          <div className="pl-8">
+            {visibleItems.map((item, index) => (
+              <VirtualNewsItem key={item.id || index} item={item} index={index} />
+            ))}
+            
+            {/* Infinite scroll trigger */}
+            {visibleCount < newsItems.length && (
+              <div ref={loadMoreRef} className="py-8 text-center">
+                <div className="inline-flex items-center gap-3 text-white/60 text-sm bg-white/5 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/10">
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <span className="font-medium">Loading more news...</span>
+                </div>
               </div>
-            </div>
-          )}
-          
-          {/* End indicator */}
-          {visibleCount >= newsItems.length && newsItems.length > 20 && (
-            <div className="py-8 text-center text-white/60 text-sm">
-              🎉 You've reached the end! {newsItems.length} total news items
-            </div>
-          )}
+            )}
+            
+            {/* End indicator */}
+            {visibleCount >= newsItems.length && newsItems.length > 20 && (
+              <div className="py-8 text-center">
+                <div className="inline-flex items-center gap-2 text-white/70 text-sm bg-white/5 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/10">
+                  <span className="text-lg">🎉</span>
+                  <span className="font-medium">You've reached the end! {newsItems.length} total news items</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

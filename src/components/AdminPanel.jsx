@@ -360,42 +360,42 @@ export default function AdminPanel({ newsItems, onAddNews, onAddMultipleNews, on
   ];
 
   const renderDashboard = () => (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg p-6 shadow-sm">
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 shadow-xl hover:bg-white/15 hover:scale-105 transition-all duration-300 group">
           <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <span className="text-2xl font-bold text-blue-600">+</span>
+            <div className="p-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <span className="text-2xl font-bold text-white">+</span>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total News</p>
-              <p className="text-2xl font-bold text-gray-900">{newsItems.length}</p>
+            <div className="ml-6">
+              <p className="text-sm font-medium text-white/70">Total News</p>
+              <p className="text-3xl font-bold text-white">{newsItems.length}</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white rounded-lg p-6 shadow-sm">
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 shadow-xl hover:bg-white/15 hover:scale-105 transition-all duration-300 group">
           <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <span className="text-2xl font-bold text-green-600">▶</span>
+            <div className="p-4 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <span className="text-2xl font-bold text-white">▶</span>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">With Videos</p>
-              <p className="text-2xl font-bold text-gray-900">
+            <div className="ml-6">
+              <p className="text-sm font-medium text-white/70">With Videos</p>
+              <p className="text-3xl font-bold text-white">
                 {newsItems.filter(item => item.youtubeUrl).length}
               </p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white rounded-lg p-6 shadow-sm">
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 shadow-xl hover:bg-white/15 hover:scale-105 transition-all duration-300 group">
           <div className="flex items-center">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <span className="text-2xl font-bold text-purple-600">□</span>
+            <div className="p-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <span className="text-2xl font-bold text-white">□</span>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">This Month</p>
-              <p className="text-2xl font-bold text-gray-900">
+            <div className="ml-6">
+              <p className="text-sm font-medium text-white/70">This Month</p>
+              <p className="text-3xl font-bold text-white">
                 {newsItems.filter(item => {
                   const newsDate = new Date(item.date);
                   const currentDate = new Date();
@@ -408,21 +408,33 @@ export default function AdminPanel({ newsItems, onAddNews, onAddMultipleNews, on
         </div>
       </div>
 
-      <div className="bg-white rounded-lg p-6 shadow-sm">
-        <h3 className="text-lg font-semibold mb-4">Recent News</h3>
-        <div className="space-y-3">
+      <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 shadow-xl">
+        <h3 className="text-xl font-semibold mb-6 text-white flex items-center gap-2">
+          <span className="text-2xl">📰</span>
+          Recent News
+        </h3>
+        <div className="space-y-4">
           {newsItems.slice(0, 3).map((item, index) => (
-            <div key={item.id || index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div>
-                <p className="font-medium">{item.title}</p>
-                <p className="text-sm text-gray-600">{item.date} • {item.tag}</p>
+            <div key={item.id || index} className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-4 hover:bg-white/15 hover:scale-102 transition-all duration-200 group">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <p className="font-semibold text-white group-hover:text-red-100 transition-colors">{item.title}</p>
+                  <div className="flex items-center gap-3 mt-2">
+                    <span className="text-sm text-white/70 bg-white/10 px-2 py-1 rounded-full">
+                      📅 {item.date}
+                    </span>
+                    <span className="text-xs text-white bg-gradient-to-r from-red-500 to-red-600 px-2 py-1 rounded-full">
+                      {item.tag}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleEditNews(item)}
+                  className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 border border-white/30 hover:scale-105"
+                >
+                  ✏️ Edit
+                </button>
               </div>
-              <button
-                onClick={() => handleEditNews(item)}
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-              >
-                Edit
-              </button>
             </div>
           ))}
         </div>
@@ -878,42 +890,51 @@ export default function AdminPanel({ newsItems, onAddNews, onAddMultipleNews, on
   };
 
   return (
-    <div className="bg-red-700 min-h-screen text-white">
+    <div className="bg-gradient-to-br from-red-700 via-red-600 to-red-800 min-h-screen text-white">
       <div className="max-w-7xl mx-auto px-6 py-6">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Tesla News Admin Panel</h1>
-          <div className="space-x-4">
-            <button
-              onClick={() => navigate('/')}
-              className="bg-white text-red-700 px-4 py-2 rounded hover:bg-gray-100 transition-colors"
-            >
-              View Timeline
-            </button>
-            <button
-              onClick={handleLogout}
-              className="bg-red-800 text-white px-4 py-2 rounded hover:bg-red-900 transition-colors"
-            >
-              Logout
-            </button>
+        {/* Enhanced Header */}
+        <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-2xl mb-8 p-6 shadow-xl">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-red-100 bg-clip-text text-transparent">
+                Tesla News Admin Panel
+              </h1>
+              <p className="text-lg text-white/80 mt-2">Manage your news timeline and content</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => navigate('/')}
+                className="bg-white/10 backdrop-blur-sm text-white px-6 py-3 rounded-xl hover:bg-white/20 transition-all duration-200 font-medium border border-white/20 shadow-lg"
+              >
+                <span className="mr-2">🏠</span>
+                View Timeline
+              </button>
+              <button
+                onClick={handleLogout}
+                className="bg-red-600/80 backdrop-blur-sm text-white px-6 py-3 rounded-xl hover:bg-red-700/80 transition-all duration-200 font-medium border border-red-400/30 shadow-lg"
+              >
+                <span className="mr-2">🚪</span>
+                Logout
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="bg-white/10 rounded-lg p-1 mb-8">
-          <div className="flex space-x-1">
+        {/* Enhanced Tab Navigation */}
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-2 mb-8 shadow-xl">
+          <div className="flex flex-wrap gap-2">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-md transition-colors ${
+                className={`flex-1 min-w-fit flex items-center justify-center gap-3 py-4 px-6 rounded-xl transition-all duration-300 font-medium ${
                   activeTab === tab.id
-                    ? 'bg-white text-red-700 font-medium'
-                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                    ? 'bg-white text-red-700 shadow-lg scale-105 border border-red-200/50'
+                    : 'text-white/70 hover:text-white hover:bg-white/10 hover:scale-102 border border-transparent'
                 }`}
               >
-                <span>{tab.icon}</span>
-                <span className="hidden sm:inline">{tab.name}</span>
+                <span className="text-lg">{tab.icon}</span>
+                <span className="hidden sm:inline text-sm">{tab.name}</span>
               </button>
             ))}
           </div>
