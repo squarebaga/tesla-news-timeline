@@ -230,90 +230,194 @@ export default function AdminPanel({ newsItems, onAddNews, onAddMultipleNews, on
   };
 
   const generateSampleData = (count = 3) => {
-    const titles = [
-      'Tesla Cybertruck Production Milestone Achieved',
-      'Supercharger V4 Network Expansion Accelerates',
-      'AI Day 2025 Reveals Revolutionary Advances',
-      'Model Y Performance Refresh Unveiled',
-      'Gigafactory Berlin Doubles Production Capacity',
-      'FSD Beta V12 Shows Human-Level Performance',
-      'Tesla Energy Storage Breaks Industry Records',
-      'Robotaxi Service Launches in Major Cities',
-      'Neural Network Architecture Reaches New Heights',
-      'Battery Day Announces 4680 Cell Mass Production',
-      'Model S Plaid Sets New Nürburgring Record',
-      'Tesla Solar Roof Achieves Grid Parity',
-      'Optimus Robot Demonstrates Advanced Capabilities',
-      'Model 3 Highland Refresh Global Launch',
-      'Tesla Semi Completes Cross-Country Test',
-      'Megapack Factory Opens in Shanghai',
-      'FSD Hardware 4.0 Enters Production',
-      'Tesla Insurance Expands to New Markets',
-      'Cybertruck Beast Mode Performance Test',
-      'Supercharger Magic Dock CCS Compatibility',
-      'Tesla Bot Gen 2 Factory Demonstration',
-      'Model X Refresh Interior Updates',
-      'Gigafactory Texas Reaches Full Capacity',
-      'Tesla Energy Virtual Power Plant Launch',
-      'Autopilot Vision-Only System Update',
-      'Tesla Roadster SpaceX Package Details',
-      'Model Y Juniper Prototype Spotted',
-      'Tesla Phone Rumors Gain Momentum',
-      'Giga Berlin Water Usage Optimization',
-      'Tesla Wireless Charging Technology Demo'
-    ];
-    
-    const summaries = [
-      'Tesla achieves major production milestone with significant manufacturing improvements.',
-      'Advanced charging infrastructure deployment continues across global markets.',
-      'Breakthrough artificial intelligence developments reshape autonomous vehicle industry.',
-      'Enhanced performance specifications and design updates for popular electric SUV.',
-      'European manufacturing facility announces major capacity expansion and efficiency gains.',
-      'Latest autonomous driving software demonstrates remarkable improvements in real-world scenarios.',
-      'Revolutionary energy storage solutions transform residential and commercial applications.',
-      'Autonomous transportation service begins operations in metropolitan areas worldwide.',
-      'Advanced neural processing capabilities enable unprecedented vehicle intelligence systems.',
-      'Next-generation battery technology promises extended range and rapid charging capabilities.',
-      'High-performance electric sedan breaks multiple track records in rigorous testing.',
-      'Integrated solar roofing solution achieves cost competitiveness with traditional energy sources.',
-      'Humanoid robot platform showcases advanced manipulation and navigation capabilities.',
-      'Refreshed compact sedan receives global launch with improved efficiency and features.',
-      'Electric commercial vehicle completes extensive long-distance reliability testing program.',
-      'Large-scale energy storage manufacturing facility begins operations in international market.',
-      'Advanced processing hardware enters mass production for next-generation autonomous vehicles.',
-      'Usage-based insurance product expands availability to additional geographic regions.',
-      'Flagship pickup truck demonstrates exceptional performance capabilities in challenging conditions.',
-      'Universal charging compatibility enables broader access to Tesla charging infrastructure.',
-      'Second-generation humanoid robot demonstrates manufacturing assembly capabilities.',
-      'Luxury SUV receives interior technology updates and comfort enhancements.',
-      'Texas manufacturing facility achieves maximum production capacity ahead of schedule.',
-      'Distributed energy network connects residential and commercial storage systems.',
-      'Camera-based autonomous driving system receives significant capability improvements.',
-      'Ultra-high-performance sports car reveals advanced propulsion system details.',
-      'Next-generation SUV development program reaches advanced prototype testing phase.',
-      'Consumer electronics device speculation intensifies following recent technology patents.',
-      'Sustainable manufacturing practices reduce environmental impact at German facility.',
-      'Contactless vehicle charging technology undergoes public demonstration and testing.'
-    ];
-    
-    const tags = [
-      '#Cybertruck', '#Supercharger', '#AI', '#ModelY', '#Gigafactory', '#FSD', 
-      '#Energy', '#Robotaxi', '#Neural', '#Battery', '#ModelS', '#Solar', 
-      '#Optimus', '#Model3', '#Semi', '#Megapack', '#Hardware', '#Insurance',
-      '#Performance', '#Charging', '#Robot', '#ModelX', '#Texas', '#VPP',
-      '#Autopilot', '#Roadster', '#Juniper', '#Phone', '#Berlin', '#Wireless'
-    ];
+    const positiveNews = {
+      titles: [
+        'Tesla Cybertruck Production Milestone Achieved',
+        'Supercharger V4 Network Expansion Accelerates',
+        'AI Day 2025 Reveals Revolutionary Advances',
+        'Model Y Performance Refresh Unveiled',
+        'Gigafactory Berlin Doubles Production Capacity',
+        'FSD Beta V12 Shows Human-Level Performance',
+        'Tesla Energy Storage Breaks Industry Records',
+        'Robotaxi Service Launches in Major Cities',
+        'Neural Network Architecture Reaches New Heights',
+        'Battery Day Announces 4680 Cell Mass Production',
+        'Model S Plaid Sets New Nürburgring Record',
+        'Tesla Solar Roof Achieves Grid Parity',
+        'Optimus Robot Demonstrates Advanced Capabilities',
+        'Model 3 Highland Refresh Global Launch',
+        'Tesla Semi Completes Cross-Country Test',
+        'Megapack Factory Opens in Shanghai',
+        'FSD Hardware 4.0 Enters Production',
+        'Tesla Insurance Expands to New Markets',
+        'Cybertruck Beast Mode Performance Test',
+        'Supercharger Magic Dock CCS Compatibility',
+        'Tesla Bot Gen 2 Factory Demonstration',
+        'Model X Refresh Interior Updates',
+        'Gigafactory Texas Reaches Full Capacity',
+        'Tesla Energy Virtual Power Plant Launch',
+        'Autopilot Vision-Only System Update',
+        'Tesla Roadster SpaceX Package Details',
+        'Model Y Juniper Prototype Spotted',
+        'Tesla Phone Rumors Gain Momentum',
+        'Giga Berlin Water Usage Optimization',
+        'Tesla Wireless Charging Technology Demo'
+      ],
+      summaries: [
+        'Tesla achieves major production milestone with significant manufacturing improvements.',
+        'Advanced charging infrastructure deployment continues across global markets.',
+        'Breakthrough artificial intelligence developments reshape autonomous vehicle industry.',
+        'Enhanced performance specifications and design updates for popular electric SUV.',
+        'European manufacturing facility announces major capacity expansion and efficiency gains.',
+        'Latest autonomous driving software demonstrates remarkable improvements in real-world scenarios.',
+        'Revolutionary energy storage solutions transform residential and commercial applications.',
+        'Autonomous transportation service begins operations in metropolitan areas worldwide.',
+        'Advanced neural processing capabilities enable unprecedented vehicle intelligence systems.',
+        'Next-generation battery technology promises extended range and rapid charging capabilities.',
+        'High-performance electric sedan breaks multiple track records in rigorous testing.',
+        'Integrated solar roofing solution achieves cost competitiveness with traditional energy sources.',
+        'Humanoid robot platform showcases advanced manipulation and navigation capabilities.',
+        'Refreshed compact sedan receives global launch with improved efficiency and features.',
+        'Electric commercial vehicle completes extensive long-distance reliability testing program.',
+        'Large-scale energy storage manufacturing facility begins operations in international market.',
+        'Advanced processing hardware enters mass production for next-generation autonomous vehicles.',
+        'Usage-based insurance product expands availability to additional geographic regions.',
+        'Flagship pickup truck demonstrates exceptional performance capabilities in challenging conditions.',
+        'Universal charging compatibility enables broader access to Tesla charging infrastructure.',
+        'Second-generation humanoid robot demonstrates manufacturing assembly capabilities.',
+        'Luxury SUV receives interior technology updates and comfort enhancements.',
+        'Texas manufacturing facility achieves maximum production capacity ahead of schedule.',
+        'Distributed energy network connects residential and commercial storage systems.',
+        'Camera-based autonomous driving system receives significant capability improvements.',
+        'Ultra-high-performance sports car reveals advanced propulsion system details.',
+        'Next-generation SUV development program reaches advanced prototype testing phase.',
+        'Consumer electronics device speculation intensifies following recent technology patents.',
+        'Sustainable manufacturing practices reduce environmental impact at German facility.',
+        'Contactless vehicle charging technology undergoes public demonstration and testing.'
+      ],
+      tags: [
+        '#Cybertruck', '#Supercharger', '#AI', '#ModelY', '#Gigafactory', '#FSD', 
+        '#Energy', '#Robotaxi', '#Neural', '#Battery', '#ModelS', '#Solar', 
+        '#Optimus', '#Model3', '#Semi', '#Megapack', '#Hardware', '#Insurance',
+        '#Performance', '#Charging', '#Robot', '#ModelX', '#Texas', '#VPP',
+        '#Autopilot', '#Roadster', '#Juniper', '#Phone', '#Berlin', '#Wireless'
+      ]
+    };
+
+    const criticalNews = {
+      titles: [
+        'Tesla FSD Beta Causes Multiple Traffic Violations',
+        'Cybertruck Delivery Delays Continue to Mount',
+        'Tesla Quality Control Issues at Gigafactory Texas',
+        'NHTSA Investigating Tesla Autopilot Safety Concerns',
+        'Tesla Stock Faces Analyst Downgrades',
+        'Former Tesla Engineer Reveals Safety Shortcuts',
+        'Tesla Supercharger Network Outages Increase',
+        'Model Y Recalls Due to Seat Belt Defects',
+        'Tesla Insurance Claims Processing Delays',
+        'Gigafactory Berlin Environmental Violations',
+        'Tesla Board Governance Practices Questioned',
+        'Model 3 Battery Degradation Issues Surface',
+        'Tesla Service Center Wait Times Exceed Expectations',
+        'FSD Hardware Limitations Exposed by Researchers',
+        'Tesla Workplace Safety Violations Reported',
+        'Cybertruck Production Costs Spiral Out of Control',
+        'Tesla Solar Roof Installation Problems Persist',
+        'Model S Fire Incidents Under Investigation',
+        'Tesla Autopilot Phantom Braking Complaints Rise',
+        'Gigafactory Shanghai Labor Dispute Emerges',
+        'Tesla Energy Storage Fire Safety Concerns',
+        'Model X Falcon Wing Door Reliability Issues',
+        'Tesla Semi Range Claims Disputed by Competitors',
+        'FSD Beta Subscription Refund Requests Surge',
+        'Tesla Paint Quality Complaints Increase',
+        'Supercharger Pricing Transparency Questioned',
+        'Tesla Mobile Connector Safety Recall',
+        'Model Y Heat Pump Failures in Cold Weather',
+        'Tesla Insurance Coverage Gaps Identified',
+        'Gigafactory Nevada Production Slowdown'
+      ],
+      summaries: [
+        'Independent testing reveals concerning safety violations in Tesla FSD beta software during real-world driving scenarios.',
+        'Tesla continues to push back Cybertruck delivery timelines, disappointing thousands of reservation holders.',
+        'Manufacturing defects and rushed production schedules raise quality concerns at Texas facility.',
+        'Federal safety regulators expand investigation into Tesla Autopilot following multiple collision reports.',
+        'Wall Street analysts cite declining margins and increased competition in EV market downgrades.',
+        'Whistleblower allegations suggest Tesla prioritized production speed over safety protocols.',
+        'Tesla charging network reliability questioned as outage reports increase across multiple regions.',
+        'NHTSA recall affects thousands of Model Y vehicles due to potentially faulty seat belt components.',
+        'Tesla customers report significant delays in insurance claim processing and customer service.',
+        'German environmental authorities cite Tesla for multiple violations at Berlin manufacturing facility.',
+        'Shareholder advocacy groups raise concerns about Tesla board independence and oversight.',
+        'Long-term Tesla owners report concerning battery capacity loss earlier than expected.',
+        'Tesla service appointments now require weeks of waiting, frustrating customers nationwide.',
+        'Research reveals fundamental limitations in Tesla FSD hardware capabilities for full autonomy.',
+        'OSHA investigation finds multiple safety violations at Tesla manufacturing facilities.',
+        'Production costs for Cybertruck significantly exceed initial estimates, threatening profitability.',
+        'Tesla solar roof customers face installation delays and performance issues years after ordering.',
+        'Multiple Model S fire incidents prompt investigation into high-voltage battery safety.',
+        'Tesla Autopilot phantom braking complaints reach record levels according to NHTSA data.',
+        'Labor disputes at Shanghai facility highlight working condition concerns at Tesla factories.',
+        'Fire safety experts raise concerns about Tesla Megapack installations after recent incidents.',
+        'Model X owners report frequent falcon wing door malfunctions and expensive repair costs.',
+        'Independent testing suggests Tesla Semi range claims may be significantly overstated.',
+        'Increasing number of FSD beta subscribers request refunds citing poor performance.',
+        'Tesla paint quality issues persist across multiple model lines according to consumer reports.',
+        'Consumer groups question lack of transparency in Tesla Supercharger dynamic pricing.',
+        'Tesla recalls mobile connector charging equipment due to overheating safety concerns.',
+        'Model Y heat pump system failures leave owners without cabin heating in winter conditions.',
+        'Insurance coverage gaps identified in Tesla insurance policies compared to traditional providers.',
+        'Production slowdown at Nevada Gigafactory raises questions about Tesla energy business.'
+      ],
+      tags: [
+        '#FSDConcerns', '#CybertruckDelays', '#QualityIssues', '#SafetyInvestigation', '#StockConcerns',
+        '#Whistleblower', '#ChargingProblems', '#Recalls', '#InsuranceIssues', '#Environmental',
+        '#Governance', '#BatteryDegradation', '#ServiceIssues', '#HardwareLimitations', '#WorkplaceSafety',
+        '#ProductionCosts', '#SolarProblems', '#FireSafety', '#PhantomBraking', '#LaborDisputes',
+        '#EnergySafety', '#ReliabilityIssues', '#RangeClaims', '#RefundRequests', '#PaintQuality',
+        '#PricingConcerns', '#RecallNotice', '#HeatPumpFailure', '#CoverageGaps', '#ProductionSlowdown'
+      ]
+    };
     
     const sampleNews = [];
     const baseTimestamp = Date.now();
+    
+    // For larger counts (like 100), split evenly between positive and negative
+    const halfCount = Math.floor(count / 2);
+    const positiveCount = count > 10 ? halfCount : Math.ceil(count * 0.7); // 70% positive for small counts
+    const negativeCount = count - positiveCount;
+    
+    // Create array of sentiments in random order
+    const sentiments = [];
+    for (let i = 0; i < positiveCount; i++) sentiments.push('positive');
+    for (let i = 0; i < negativeCount; i++) sentiments.push('negative');
+    
+    // Shuffle sentiments array to randomize order
+    for (let i = sentiments.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [sentiments[i], sentiments[j]] = [sentiments[j], sentiments[i]];
+    }
+    
+    // Keep track of indices for each sentiment type
+    let positiveIndex = 0;
+    let negativeIndex = 0;
+    
+    // Generate news items in random sentiment order
     for (let i = 0; i < count; i++) {
+      const sentiment = sentiments[i];
+      const isPositive = sentiment === 'positive';
+      
+      const newsData = isPositive ? positiveNews : criticalNews;
+      const currentIndex = isPositive ? positiveIndex++ : negativeIndex++;
+      
       sampleNews.push({
-        id: baseTimestamp + i * 1000, // Ensure unique IDs by adding seconds
-        title: titles[i % titles.length],
-        summary: summaries[i % summaries.length],
-        tag: tags[i % tags.length],
+        id: baseTimestamp + i * 1000,
+        title: newsData.titles[currentIndex % newsData.titles.length],
+        summary: newsData.summaries[currentIndex % newsData.summaries.length],
+        tag: newsData.tags[currentIndex % newsData.tags.length],
         date: new Date(Date.now() - (i * 86400000)).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }),
-        youtubeUrl: i % 3 === 0 ? 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' : ''
+        youtubeUrl: i % 3 === 0 ? 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' : '',
+        sentiment: sentiment
       });
     }
     
@@ -322,8 +426,8 @@ export default function AdminPanel({ newsItems, onAddNews, onAddMultipleNews, on
     } else {
       sampleNews.forEach(news => onAddNews(news));
     }
-    addDebugLog('info', `Generated ${sampleNews.length} sample news items`);
-    alert(`${sampleNews.length} sample news items generated!`);
+    addDebugLog('info', `Generated ${sampleNews.length} sample news items (${positiveCount} positive, ${negativeCount} critical)`);
+    alert(`${sampleNews.length} sample news items generated!\n${positiveCount} positive news\n${negativeCount} critical news`);
   };
 
   const generatePerformanceTestData = () => {
