@@ -68,22 +68,21 @@ const LazyYouTubeEmbed = React.memo(({ url }) => {
   );
 });
 
-// Optimized virtual scrolling news item component with memoization
-const VirtualNewsItem = React.memo(({ item, index }) => {
+// Tesla Positive News Component (subtle green styling)
+const PositiveNewsItem = React.memo(({ item, index }) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // Debounce visibility changes to reduce re-renders
         if (entry.isIntersecting !== isVisible) {
           setIsVisible(entry.isIntersecting);
         }
       },
       { 
-        threshold: 0.05, // Reduced threshold for better performance
-        rootMargin: '50px 0px' // Reduced margin to load less content ahead
+        threshold: 0.05,
+        rootMargin: '50px 0px'
       }
     );
 
@@ -92,71 +91,167 @@ const VirtualNewsItem = React.memo(({ item, index }) => {
     }
 
     return () => observer.disconnect();
-  }, [isVisible]); // Add dependency to prevent unnecessary re-observations
+  }, [isVisible]);
 
   return (
     <div ref={ref} className="mb-8 relative min-h-[200px]">
-      {/* Simplified timeline marker for better performance */}
-      <div className="absolute left-[-16px] top-6 w-4 h-4 bg-white rounded-full border-2 border-red-400/50"></div>
+      {/* Subtle green marker */}
+      <div className="absolute left-[-16px] top-6 w-4 h-4 bg-white rounded-full border-2 border-green-400/40"></div>
       
       {isVisible ? (
-        <div className="bg-white/5 rounded-2xl border border-white/10 p-6 will-change-transform hover:bg-white/8 hover:border-white/15 transition-colors duration-200">
-          {/* Header with date and tag */}
+        <div className="bg-green-50/15 rounded-2xl border border-green-200/20 p-6 hover:bg-green-50/25 hover:border-green-200/30 transition-colors duration-200">
+          {/* Header with date, tag, and subtle sentiment indicator */}
           <div className="flex flex-wrap items-center gap-3 mb-4">
-            <time className="text-sm font-medium text-white/80 bg-white/10 px-3 py-1.5 rounded-full">
+            <time className="text-sm font-medium text-white/80 bg-green-100/15 px-3 py-1.5 rounded-full">
               📅 {item.date}
             </time>
             <span className="text-xs font-bold text-white bg-red-600 px-3 py-1.5 rounded-full">
               {item.tag}
             </span>
+            <span className="text-xs font-medium text-green-200/90 bg-green-600/50 px-2 py-1 rounded-full">
+              👍 Positive
+            </span>
           </div>
           
-          {/* Title with better typography */}
           <h2 className="text-xl font-bold text-white mb-3 leading-tight">
             {item.title}
           </h2>
           
-          {/* Summary with improved readability */}
           <p className="text-white/90 leading-relaxed mb-4 text-sm">
             {item.summary}
           </p>
           
-          {/* YouTube embed */}
           {item.youtubeUrl && <LazyYouTubeEmbed url={item.youtubeUrl} />}
           
-          {/* Simplified read more section */}
-          <div className="flex justify-between items-center mt-6 pt-4 border-t border-white/10">
+          <div className="flex justify-between items-center mt-6 pt-4 border-t border-green-200/20">
             <a 
               href="#" 
-              className="inline-flex items-center gap-2 text-white/90 hover:text-white font-medium text-sm bg-white/10 hover:bg-white/15 px-4 py-2 rounded-xl transition-colors duration-150"
+              className="inline-flex items-center gap-2 text-white/90 hover:text-white font-medium text-sm bg-green-100/15 hover:bg-green-100/25 px-4 py-2 rounded-xl transition-colors duration-150"
             >
               <span>Read More</span>
               <span>→</span>
             </a>
             
-            {/* Simplified share button */}
-            <button className="inline-flex items-center gap-2 text-white/70 hover:text-white/90 text-sm px-3 py-2 rounded-xl hover:bg-white/10 transition-colors duration-150">
+            <button className="inline-flex items-center gap-2 text-white/70 hover:text-white/90 text-sm px-3 py-2 rounded-xl hover:bg-green-100/15 transition-colors duration-150">
               <span>⚡</span>
               Share
             </button>
           </div>
         </div>
       ) : (
-        <div className="bg-white/5 rounded-2xl border border-white/10 p-6 animate-pulse">
+        <div className="bg-green-50/15 rounded-2xl border border-green-200/20 p-6 animate-pulse">
           <div className="flex gap-3 mb-4">
-            <div className="h-6 bg-white/20 rounded-full w-24"></div>
-            <div className="h-6 bg-white/20 rounded-full w-20"></div>
+            <div className="h-6 bg-green-200/30 rounded-full w-24"></div>
+            <div className="h-6 bg-green-200/30 rounded-full w-20"></div>
           </div>
-          <div className="h-7 bg-white/20 rounded-lg w-3/4 mb-3"></div>
+          <div className="h-7 bg-green-200/30 rounded-lg w-3/4 mb-3"></div>
           <div className="space-y-2 mb-4">
-            <div className="h-4 bg-white/20 rounded w-full"></div>
-            <div className="h-4 bg-white/20 rounded w-2/3"></div>
+            <div className="h-4 bg-green-200/30 rounded w-full"></div>
+            <div className="h-4 bg-green-200/30 rounded w-2/3"></div>
           </div>
-          <div className="h-10 bg-white/20 rounded-xl w-32"></div>
+          <div className="h-10 bg-green-200/30 rounded-xl w-32"></div>
         </div>
       )}
     </div>
   );
+});
+
+// Tesla Critical/TESLAQ News Component (subtle amber styling)
+const NegativeNewsItem = React.memo(({ item, index }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting !== isVisible) {
+          setIsVisible(entry.isIntersecting);
+        }
+      },
+      { 
+        threshold: 0.05,
+        rootMargin: '50px 0px'
+      }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, [isVisible]);
+
+  return (
+    <div ref={ref} className="mb-8 relative min-h-[200px]">
+      {/* Subtle amber marker */}
+      <div className="absolute left-[-16px] top-6 w-4 h-4 bg-white rounded-full border-2 border-amber-400/40"></div>
+      
+      {isVisible ? (
+        <div className="bg-amber-50/20 rounded-2xl border border-amber-200/25 p-6 hover:bg-amber-50/30 hover:border-amber-200/35 transition-colors duration-200">
+          {/* Header with date, tag, and subtle sentiment indicator */}
+          <div className="flex flex-wrap items-center gap-3 mb-4">
+            <time className="text-sm font-medium text-white/80 bg-amber-100/15 px-3 py-1.5 rounded-full">
+              📅 {item.date}
+            </time>
+            <span className="text-xs font-bold text-white bg-amber-600/70 px-3 py-1.5 rounded-full">
+              {item.tag}
+            </span>
+            <span className="text-xs font-medium text-amber-200/90 bg-amber-600/50 px-2 py-1 rounded-full">
+              ⚠️ Critical
+            </span>
+          </div>
+          
+          <h2 className="text-xl font-bold text-white mb-3 leading-tight">
+            {item.title}
+          </h2>
+          
+          <p className="text-white/85 leading-relaxed mb-4 text-sm">
+            {item.summary}
+          </p>
+          
+          {item.youtubeUrl && <LazyYouTubeEmbed url={item.youtubeUrl} />}
+          
+          <div className="flex justify-between items-center mt-6 pt-4 border-t border-amber-200/20">
+            <a 
+              href="#" 
+              className="inline-flex items-center gap-2 text-white/90 hover:text-white font-medium text-sm bg-amber-100/15 hover:bg-amber-100/25 px-4 py-2 rounded-xl transition-colors duration-150"
+            >
+              <span>Read More</span>
+              <span>→</span>
+            </a>
+            
+            <button className="inline-flex items-center gap-2 text-white/70 hover:text-white/90 text-sm px-3 py-2 rounded-xl hover:bg-amber-100/15 transition-colors duration-150">
+              <span>⚠️</span>
+              Share
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-amber-50/20 rounded-2xl border border-amber-200/25 p-6 animate-pulse">
+          <div className="flex gap-3 mb-4">
+            <div className="h-6 bg-amber-200/30 rounded-full w-24"></div>
+            <div className="h-6 bg-amber-200/30 rounded-full w-20"></div>
+          </div>
+          <div className="h-7 bg-amber-200/30 rounded-lg w-3/4 mb-3"></div>
+          <div className="space-y-2 mb-4">
+            <div className="h-4 bg-amber-200/30 rounded w-full"></div>
+            <div className="h-4 bg-amber-200/30 rounded w-2/3"></div>
+          </div>
+          <div className="h-10 bg-amber-200/30 rounded-xl w-32"></div>
+        </div>
+      )}
+    </div>
+  );
+});
+
+// Original VirtualNewsItem as fallback for mixed sentiment or backward compatibility
+const VirtualNewsItem = React.memo(({ item, index }) => {
+  // Use appropriate component based on sentiment
+  if (item.sentiment === 'negative') {
+    return <NegativeNewsItem item={item} index={index} />;
+  } else {
+    return <PositiveNewsItem item={item} index={index} />;
+  }
 });
 
 export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
@@ -200,13 +295,22 @@ export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
     }
   }, [availableMonths, selectedMonth]);
 
-  // Filter news items by selected month
+  // Filter news items by selected month and sort chronologically
   const filteredNewsItems = useMemo(() => {
     if (!selectedMonth || !monthIndex.index.has(selectedMonth)) {
       return [];
     }
-    return monthIndex.index.get(selectedMonth).map(entry => entry.item);
+    const items = monthIndex.index.get(selectedMonth).map(entry => entry.item);
+    // Sort by date (newest first)
+    return items.sort((a, b) => new Date(b.date) - new Date(a.date));
   }, [selectedMonth, monthIndex]);
+
+  // Separate positive and negative news for dual-sided display
+  const separatedNews = useMemo(() => {
+    const positive = filteredNewsItems.filter(item => item.sentiment !== 'negative');
+    const negative = filteredNewsItems.filter(item => item.sentiment === 'negative');
+    return { positive, negative, all: filteredNewsItems };
+  }, [filteredNewsItems]);
 
   // Date range info
   const dateRange = useMemo(() => {
@@ -347,7 +451,7 @@ export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
           </div>
         )}
         
-        {/* Month Summary */}
+        {/* Month Summary with Balance Display */}
         {selectedMonth && filteredNewsItems.length > 0 && (
           <div className="mb-6 text-center">
             <div className="inline-flex items-center gap-3 text-white/90 text-sm bg-white/10 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/10">
@@ -355,9 +459,21 @@ export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
               <span className="font-medium">
                 Viewing {new Date(selectedMonth + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
               </span>
-              <span className="bg-white/20 px-2 py-1 rounded-full text-xs font-bold">
-                {filteredNewsItems.length} news items
-              </span>
+              <div className="flex gap-2">
+                {separatedNews.positive.length > 0 && (
+                  <span className="bg-green-600/80 px-2 py-1 rounded-full text-xs font-bold text-green-100">
+                    👍 {separatedNews.positive.length}
+                  </span>
+                )}
+                {separatedNews.negative.length > 0 && (
+                  <span className="bg-orange-600/80 px-2 py-1 rounded-full text-xs font-bold text-orange-100">
+                    ⚠️ {separatedNews.negative.length}
+                  </span>
+                )}
+                <span className="bg-white/20 px-2 py-1 rounded-full text-xs font-bold">
+                  {filteredNewsItems.length} total
+                </span>
+              </div>
             </div>
           </div>
         )}
@@ -365,13 +481,76 @@ export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
         <div ref={timelineRef} className="relative">
           {filteredNewsItems.length > 0 ? (
             <>
-              {/* Enhanced timeline line */}
-              <div className="absolute left-2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-white/80 via-white/40 to-white/20 rounded-full shadow-sm"></div>
+              {/* Desktop: Dual-sided chronological layout */}
+              <div className="hidden lg:block relative">
+                {/* Header row with side labels */}
+                <div className="grid grid-cols-2 gap-8 mb-6">
+                  {/* Left side header - Critical */}
+                  <div className="text-center lg:text-right">
+                    <div className="inline-flex items-center gap-2 bg-amber-500/20 backdrop-blur-sm px-4 py-2 rounded-xl border border-amber-300/30">
+                      <span className="text-lg">⚠️</span>
+                      <span className="text-sm font-semibold text-amber-100">Critical Perspectives</span>
+                      <span className="bg-amber-600/80 px-2 py-1 rounded-full text-xs font-bold text-amber-100">
+                        {separatedNews.negative.length}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Right side header - Positive */}
+                  <div className="text-center lg:text-left">
+                    <div className="inline-flex items-center gap-2 bg-green-600/20 backdrop-blur-sm px-4 py-2 rounded-xl border border-green-300/30">
+                      <span className="text-lg">⚡</span>
+                      <span className="text-sm font-semibold text-green-100">Tesla Updates</span>
+                      <span className="bg-green-600/80 px-2 py-1 rounded-full text-xs font-bold text-green-100">
+                        {separatedNews.positive.length}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Central timeline divider line */}
+                <div className="absolute left-1/2 top-20 bottom-0 w-1 bg-gradient-to-b from-white/80 via-white/60 to-white/20 rounded-full shadow-lg transform -translate-x-1/2 z-10"></div>
+                
+                {/* Chronological dual-sided timeline */}
+                <div className="space-y-8">
+                  {filteredNewsItems.map((item, index) => (
+                    <div key={item.id || index} className="grid grid-cols-2 gap-8 relative">
+                      {/* Left side - for critical news */}
+                      <div className="pr-8 text-right">
+                        {item.sentiment === 'negative' ? (
+                          <div className="transform">
+                            <NegativeNewsItem item={item} index={index} />
+                          </div>
+                        ) : (
+                          <div className="min-h-[50px]"></div> // Spacer for alignment
+                        )}
+                      </div>
+                      
+                      {/* Right side - for positive news */}
+                      <div className="pl-8">
+                        {item.sentiment !== 'negative' ? (
+                          <div className="transform">
+                            <PositiveNewsItem item={item} index={index} />
+                          </div>
+                        ) : (
+                          <div className="min-h-[50px]"></div> // Spacer for alignment
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
               
-              <div className="pl-8">
-                {filteredNewsItems.map((item, index) => (
-                  <VirtualNewsItem key={item.id || index} item={item} index={index} />
-                ))}
+              {/* Mobile/Tablet: Single column chronological timeline */}
+              <div className="lg:hidden">
+                {/* Single timeline line */}
+                <div className="absolute left-2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-white/80 via-white/40 to-white/20 rounded-full shadow-sm"></div>
+                
+                <div className="pl-8">
+                  {filteredNewsItems.map((item, index) => (
+                    <VirtualNewsItem key={item.id || index} item={item} index={index} />
+                  ))}
+                </div>
               </div>
             </>
           ) : selectedMonth ? (

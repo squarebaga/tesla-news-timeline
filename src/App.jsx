@@ -5,27 +5,56 @@ import Login from './components/Login';
 import AdminPanel from './components/AdminPanel';
 
 const initialNewsItems = [
+  // Tesla Positive News (existing items with sentiment added)
   {
     id: 1,
     date: "06/27/2025",
     tag: "#Autopilot",
     title: "Tesla Expands Full Self-Driving Beta Program",
     summary: "Tesla has announced an expansion of its Full Self-Driving (FSD) beta program, allowing more users to access the latest features.",
-    youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    sentiment: "positive"
   },
   {
     id: 2,
     date: "06/25/2025",
     tag: "#BatteryTech",
     title: "New Tesla Battery Technology Improves Range",
-    summary: "Tesla has unveiled a new battery technology aimed at significantly improving range of its electric vehicles."
+    summary: "Tesla has unveiled a new battery technology aimed at significantly improving range of its electric vehicles.",
+    sentiment: "positive"
   },
   {
     id: 3,
     date: "06/23/2025",
     tag: "#Supercharger",
     title: "Tesla Opens New Supercharger Stations in Europe",
-    summary: "Tesla has opened several new Supercharger stations across Europe to support growing EV demand."
+    summary: "Tesla has opened several new Supercharger stations across Europe to support growing EV demand.",
+    sentiment: "positive"
+  },
+  // Tesla Critical/TESLAQ News (new items)
+  {
+    id: 101,
+    date: "06/26/2025",
+    tag: "#FSDConcerns",
+    title: "Safety Experts Raise Concerns Over Tesla FSD Beta Expansion",
+    summary: "Several automotive safety organizations question Tesla's decision to expand FSD beta without sufficient real-world testing data.",
+    sentiment: "negative"
+  },
+  {
+    id: 102,
+    date: "06/24/2025",
+    tag: "#QualityIssues",
+    title: "Tesla Faces Increased Warranty Claims on Battery Packs",
+    summary: "Consumer reports indicate a 15% increase in battery-related warranty claims for Tesla vehicles manufactured in Q1 2025.",
+    sentiment: "negative"
+  },
+  {
+    id: 103,
+    date: "06/22/2025",
+    tag: "#MarketConcerns",
+    title: "Analysts Question Tesla's Ambitious Production Targets",
+    summary: "Wall Street analysts express skepticism about Tesla's ability to meet its 2025 production targets amid supply chain challenges.",
+    sentiment: "negative"
   }
 ];
 

@@ -10,7 +10,8 @@ export default function AdminPanel({ newsItems, onAddNews, onAddMultipleNews, on
     summary: '',
     tag: '',
     date: new Date().toISOString().split('T')[0],
-    youtubeUrl: ''
+    youtubeUrl: '',
+    sentiment: 'positive'
   });
   const [settings, setSettings] = useState({
     siteTitle: 'Tesla News Timeline',
@@ -38,7 +39,8 @@ export default function AdminPanel({ newsItems, onAddNews, onAddMultipleNews, on
         day: '2-digit',
         year: 'numeric'
       }),
-      youtubeUrl: formData.youtubeUrl
+      youtubeUrl: formData.youtubeUrl,
+      sentiment: formData.sentiment
     };
     
     if (editingNews) {
@@ -56,7 +58,8 @@ export default function AdminPanel({ newsItems, onAddNews, onAddMultipleNews, on
       summary: '',
       tag: '',
       date: new Date().toISOString().split('T')[0],
-      youtubeUrl: ''
+      youtubeUrl: '',
+      sentiment: 'positive'
     });
   };
 
@@ -79,7 +82,8 @@ export default function AdminPanel({ newsItems, onAddNews, onAddMultipleNews, on
       summary: news.summary,
       tag: news.tag,
       date: new Date(news.date).toISOString().split('T')[0],
-      youtubeUrl: news.youtubeUrl || ''
+      youtubeUrl: news.youtubeUrl || '',
+      sentiment: news.sentiment || 'positive'
     });
     setActiveTab('news');
   };
@@ -500,7 +504,7 @@ export default function AdminPanel({ newsItems, onAddNews, onAddMultipleNews, on
             />
           </div>
           
-          <div className="mb-6">
+          <div className="mb-4">
             <label className="block text-sm font-bold mb-2">YouTube URL (Optional)</label>
             <input
               type="url"
@@ -510,6 +514,23 @@ export default function AdminPanel({ newsItems, onAddNews, onAddMultipleNews, on
               placeholder="https://www.youtube.com/watch?v=..."
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
             />
+          </div>
+          
+          <div className="mb-6">
+            <label className="block text-sm font-bold mb-2">News Type</label>
+            <select
+              name="sentiment"
+              value={formData.sentiment}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
+              required
+            >
+              <option value="positive">✅ Positive (Tesla Updates)</option>
+              <option value="negative">⚠️ Critical (TESLAQ/Critics)</option>
+            </select>
+            <p className="text-xs text-gray-600 mt-1">
+              Positive news appears on the right side, critical news on the left side of the timeline
+            </p>
           </div>
           
           <div className="flex gap-2">
@@ -529,7 +550,8 @@ export default function AdminPanel({ newsItems, onAddNews, onAddMultipleNews, on
                     summary: '',
                     tag: '',
                     date: new Date().toISOString().split('T')[0],
-                    youtubeUrl: ''
+                    youtubeUrl: '',
+                    sentiment: 'positive'
                   });
                 }}
                 className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
