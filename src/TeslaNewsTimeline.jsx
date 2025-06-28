@@ -161,10 +161,8 @@ const VirtualNewsItem = React.memo(({ item, index }) => {
 
 export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
   const navigate = useNavigate();
-  const [visibleCount, setVisibleCount] = useState(20);
-  const [selectedDate, setSelectedDate] = useState('');
-  const [jumpToIndex, setJumpToIndex] = useState(null);
-  const loadMoreRef = useRef();
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const timelineRef = useRef();
 
   // Create month index for quick lookups
@@ -195,6 +193,21 @@ export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
     });
   }, [monthIndex]);
 
+  // Auto-select most recent month on initial load
+  useEffect(() => {
+    if (!selectedMonth && availableMonths.length > 0) {
+      setSelectedMonth(availableMonths[0]);
+    }
+  }, [availableMonths, selectedMonth]);
+
+  // Filter news items by selected month
+  const filteredNewsItems = useMemo(() => {
+    if (!selectedMonth || !monthIndex.index.has(selectedMonth)) {
+      return [];
+    }
+    return monthIndex.index.get(selectedMonth).map(entry => entry.item);
+  }, [selectedMonth, monthIndex]);
+
   // Date range info
   const dateRange = useMemo(() => {
     if (newsItems.length === 0) return null;
@@ -206,88 +219,32 @@ export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
     };
   }, [newsItems]);
 
-  // Jump to specific month
-  const jumpToMonth = useCallback((targetMonth) => {
+  // Switch to specific month
+  const switchToMonth = useCallback((targetMonth) => {
     if (!targetMonth || !monthIndex.index.has(targetMonth)) return;
-    
-    const firstItemForMonth = monthIndex.index.get(targetMonth)[0];
-    const targetIndex = firstItemForMonth.index;
-    
-    // Ensure enough items are visible
-    if (targetIndex >= visibleCount) {
-      setVisibleCount(Math.max(targetIndex + 10, visibleCount));
-    }
-    
-    setJumpToIndex(targetIndex);
-    setSelectedDate(targetMonth);
-  }, [monthIndex, visibleCount]);
+    setSelectedMonth(targetMonth);
+    // Scroll to top when switching months
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [monthIndex]);
 
-  // Scroll to target item when jumpToIndex changes
+  // Show/hide scroll to top button based on scroll position
   useEffect(() => {
-    if (jumpToIndex !== null && timelineRef.current) {
-      const timelineItems = timelineRef.current.children;
-      if (timelineItems[jumpToIndex]) {
-        timelineItems[jumpToIndex].scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center' 
-        });
-        
-        // Highlight the target item temporarily
-        const targetElement = timelineItems[jumpToIndex];
-        targetElement.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-        targetElement.style.borderRadius = '8px';
-        targetElement.style.padding = '16px';
-        targetElement.style.marginLeft = '-16px';
-        targetElement.style.marginRight = '-16px';
-        
-        setTimeout(() => {
-          targetElement.style.backgroundColor = '';
-          targetElement.style.borderRadius = '';
-          targetElement.style.padding = '';
-          targetElement.style.marginLeft = '';
-          targetElement.style.marginRight = '';
-        }, 2000);
-      }
-      setJumpToIndex(null);
-    }
-  }, [jumpToIndex]);
-
-  // Optimized infinite scroll effect with throttling
-  useEffect(() => {
-    let timeoutId;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && visibleCount < newsItems.length) {
-          // Throttle the scroll loading to reduce rapid re-renders
-          if (timeoutId) clearTimeout(timeoutId);
-          timeoutId = setTimeout(() => {
-            setVisibleCount(prev => Math.min(prev + 15, newsItems.length)); // Load more items at once
-          }, 100); // Small delay to batch multiple scroll events
-        }
-      },
-      { threshold: 0.3 } // Higher threshold to load less aggressively
-    );
-
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
-    }
-
-    return () => {
-      observer.disconnect();
-      if (timeoutId) clearTimeout(timeoutId);
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
     };
-  }, [visibleCount, newsItems.length]);
 
-  // Reset visible count when newsItems change significantly
-  useEffect(() => {
-    setVisibleCount(20);
-    setSelectedDate('');
-  }, [newsItems.length]);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  const visibleItems = useMemo(() => 
-    newsItems.slice(0, visibleCount), 
-    [newsItems, visibleCount]
-  );
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+
+
+
   return (
     <div className="bg-gradient-to-br from-red-700 via-red-600 to-red-800 min-h-screen text-white font-sans">
       {/* Header Section */}
@@ -334,8 +291,8 @@ export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
                       Navigate Timeline
                     </label>
                     <select
-                      value={selectedDate}
-                      onChange={(e) => jumpToMonth(e.target.value)}
+                      value={selectedMonth}
+                      onChange={(e) => switchToMonth(e.target.value)}
                       className="bg-white/10 backdrop-blur-sm text-white px-4 py-3 rounded-xl text-sm border border-white/20 focus:ring-2 focus:ring-white/30 focus:border-white/40 w-full sm:w-auto min-w-[250px] transition-all duration-200"
                     >
                       <option value="" className="text-gray-800">Select a month...</option>
@@ -357,9 +314,9 @@ export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
                       {availableMonths.slice(0, 6).map(month => (
                         <button
                           key={month}
-                          onClick={() => jumpToMonth(month)}
+                          onClick={() => switchToMonth(month)}
                           className={`px-3 py-2 text-xs rounded-lg transition-all duration-200 font-medium ${
-                            selectedDate === month
+                            selectedMonth === month
                               ? 'bg-white text-red-700 shadow-lg scale-105'
                               : 'bg-white/10 text-white hover:bg-white/20 hover:scale-105 border border-white/20'
                           }`}
@@ -390,44 +347,133 @@ export default function TeslaNewsTimeline({ newsItems, isLoggedIn }) {
           </div>
         )}
         
-        {/* Performance Stats */}
-        {newsItems.length > 20 && (
-          <div className="mb-4 text-center text-white/60 text-sm">
-            Showing {visibleCount} of {newsItems.length} news items • Scroll to load more
+        {/* Month Summary */}
+        {selectedMonth && filteredNewsItems.length > 0 && (
+          <div className="mb-6 text-center">
+            <div className="inline-flex items-center gap-3 text-white/90 text-sm bg-white/10 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/10">
+              <span className="text-lg">📅</span>
+              <span className="font-medium">
+                Viewing {new Date(selectedMonth + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              </span>
+              <span className="bg-white/20 px-2 py-1 rounded-full text-xs font-bold">
+                {filteredNewsItems.length} news items
+              </span>
+            </div>
           </div>
         )}
         
         <div ref={timelineRef} className="relative">
-          {/* Enhanced timeline line */}
-          <div className="absolute left-2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-white/80 via-white/40 to-white/20 rounded-full shadow-sm"></div>
-          
-          <div className="pl-8">
-            {visibleItems.map((item, index) => (
-              <VirtualNewsItem key={item.id || index} item={item} index={index} />
-            ))}
-            
-            {/* Infinite scroll trigger */}
-            {visibleCount < newsItems.length && (
-              <div ref={loadMoreRef} className="py-8 text-center">
-                <div className="inline-flex items-center gap-3 text-white/60 text-sm bg-white/5 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/10">
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  <span className="font-medium">Loading more news...</span>
+          {filteredNewsItems.length > 0 ? (
+            <>
+              {/* Enhanced timeline line */}
+              <div className="absolute left-2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-white/80 via-white/40 to-white/20 rounded-full shadow-sm"></div>
+              
+              <div className="pl-8">
+                {filteredNewsItems.map((item, index) => (
+                  <VirtualNewsItem key={item.id || index} item={item} index={index} />
+                ))}
+              </div>
+            </>
+          ) : selectedMonth ? (
+            <div className="py-16 text-center">
+              <div className="inline-flex flex-col items-center gap-4 text-white/70 bg-white/5 backdrop-blur-sm px-8 py-8 rounded-2xl border border-white/10">
+                <span className="text-4xl">📰</span>
+                <div>
+                  <h3 className="font-semibold mb-1">No news items found</h3>
+                  <p className="text-sm text-white/60">
+                    No news items for {new Date(selectedMonth + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                  </p>
                 </div>
               </div>
-            )}
-            
-            {/* End indicator */}
-            {visibleCount >= newsItems.length && newsItems.length > 20 && (
-              <div className="py-8 text-center">
-                <div className="inline-flex items-center gap-2 text-white/70 text-sm bg-white/5 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/10">
-                  <span className="text-lg">🎉</span>
-                  <span className="font-medium">You've reached the end! {newsItems.length} total news items</span>
+            </div>
+          ) : (
+            <div className="py-16 text-center">
+              <div className="inline-flex flex-col items-center gap-4 text-white/70 bg-white/5 backdrop-blur-sm px-8 py-8 rounded-2xl border border-white/10">
+                <span className="text-4xl">📅</span>
+                <div>
+                  <h3 className="font-semibold mb-1">Select a month to view news</h3>
+                  <p className="text-sm text-white/60">Choose a month from the dropdown above</p>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
+
+        {/* Bottom Month Navigation */}
+        {newsItems.length > 0 && (
+          <div className="mt-16 mb-8 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+            <div className="p-6">
+              <div className="text-center mb-4">
+                <h3 className="text-lg font-semibold text-white/90 flex items-center justify-center gap-2">
+                  <span className="text-xl">🗓️</span>
+                  Browse Other Months
+                </h3>
+                <p className="text-sm text-white/70 mt-1">Jump to any month to explore news from that time period</p>
+              </div>
+              
+              <div className="flex flex-col lg:flex-row gap-4 items-center justify-center">
+                {/* Month Dropdown */}
+                <select
+                  value={selectedMonth}
+                  onChange={(e) => switchToMonth(e.target.value)}
+                  className="bg-white/10 backdrop-blur-sm text-white px-4 py-3 rounded-xl text-sm border border-white/20 focus:ring-2 focus:ring-white/30 focus:border-white/40 min-w-[250px] transition-all duration-200"
+                >
+                  <option value="" className="text-gray-800">Select a month...</option>
+                  {availableMonths.map(month => (
+                    <option key={month} value={month} className="text-gray-800">
+                      {new Date(month + '-01').toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long'
+                      })} ({monthIndex.monthStats.get(month)} news)
+                    </option>
+                  ))}
+                </select>
+                
+                {/* Quick Month Buttons */}
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {availableMonths.map(month => (
+                    <button
+                      key={month}
+                      onClick={() => switchToMonth(month)}
+                      className={`px-3 py-2 text-xs rounded-lg transition-all duration-200 font-medium ${
+                        selectedMonth === month
+                          ? 'bg-white text-red-700 shadow-lg scale-105'
+                          : 'bg-white/10 text-white hover:bg-white/20 hover:scale-105 border border-white/20'
+                      }`}
+                    >
+                      {new Date(month + '-01').toLocaleDateString('en-US', { month: 'short', year: '2-digit' })}
+                      <span className="ml-1 text-[10px] opacity-70">({monthIndex.monthStats.get(month)})</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Floating Scroll to Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 bg-white/10 backdrop-blur-sm text-white p-4 rounded-full shadow-xl border border-white/20 hover:bg-white/20 hover:scale-110 transition-all duration-200 z-50 group"
+          aria-label="Scroll to top"
+        >
+          <svg 
+            className="w-6 h-6 transform group-hover:-translate-y-1 transition-transform duration-200" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M5 10l7-7m0 0l7 7m-7-7v18" 
+            />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }
